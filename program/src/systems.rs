@@ -1,0 +1,1 @@
+// Tukaj bodo sistemi, ko ne bo lažje, da je še vse v main-u, ker ni napisanega še skoraj nič in je lažje preizkušati stvari, če so na enem kupčku.
