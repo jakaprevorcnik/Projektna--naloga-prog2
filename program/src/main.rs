@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
+pub const PLAYER_SPEED: f32 = 500.0;
 
 fn main() {
     App::new()
@@ -16,7 +17,14 @@ fn main() {
         //     ..Default::default()
         // }))
     )
-    .add_systems(Startup, (spawn_camera, spawn_player, spawn_meteor))
+    .add_systems(Startup, (
+        spawn_camera,
+        spawn_player,
+        spawn_meteor,
+    ))
+    .add_systems(Update, (
+        player_movement
+    ))
     .run();
 }
 
@@ -73,4 +81,29 @@ fn spawn_meteor(
             Meteor {},
         )
     );
+}
+
+fn player_movement(keyboard_input: 
+    Res<ButtonInput<KeyCode>>,
+    mut player_query: Query<&mut Transform, With<Player>>,
+    time: Res<Time>,
+) {
+    if let Ok(mut transform) = player_query.get_single_mut() {
+        let mut direction = Vec3::ZERO;
+
+        if keyboard_input.pressed(KeyCode::KeyW) {
+             direction += Vec3::new(0.0, 1.0, 0.0)
+        }
+        if keyboard_input.pressed(KeyCode::KeyS) {
+            direction += Vec3::new(0.0, -1.0, 0.0)
+        }
+        if keyboard_input.pressed(KeyCode::KeyD) {
+            direction += Vec3::new(1.0, 0.0, 0.0)
+        }
+        if keyboard_input.pressed(KeyCode::KeyA) {
+            direction += Vec3::new(-1.0, 0.0, 0.0)
+        }
+
+        transform.translation += direction * PLAYER_SPEED * time.delta_secs();
+    }
 }
