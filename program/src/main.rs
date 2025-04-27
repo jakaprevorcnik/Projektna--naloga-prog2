@@ -49,13 +49,7 @@ fn spawn_player(
                 image: asset_server.load("sprites/spaceShips_008.png"),
                 ..Default::default()
             },
-            // Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-            // SpriteBundle{
-            //     transform: Transform::from_xyz(window.width() / 2.0, window_height() / 2.0, 0.0),
-            //     sprite: asset_server.load("sprites/spaceShips_008.png"),
-            //     ..default()
-            // },
-            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0),
+            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0).with_scale(Vec3::splat(0.5)),
             Player {},
         )
     );
@@ -91,12 +85,6 @@ fn player_movement(keyboard_input:
     if let Ok(mut transform) = player_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if keyboard_input.pressed(KeyCode::KeyW) {
-             direction += Vec3::new(0.0, 1.0, 0.0)
-        }
-        if keyboard_input.pressed(KeyCode::KeyS) {
-            direction += Vec3::new(0.0, -1.0, 0.0)
-        }
         if keyboard_input.pressed(KeyCode::KeyD) {
             direction += Vec3::new(1.0, 0.0, 0.0)
         }
