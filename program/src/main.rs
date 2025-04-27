@@ -50,7 +50,7 @@ fn spawn_player(
                 image: asset_server.load("sprites/spaceShips_008.png"),
                 ..Default::default()
             },
-            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0).with_scale(Vec3::splat(0.5)),
+            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0).with_scale(Vec3::splat(0.5)), // ce das pr y 1.5 namest 2.5 je cis na dnu, sam se ga vid samo k mas cez cel zaslon sliko.
             Player {},
         )
     );
