@@ -23,14 +23,15 @@ fn main() {
         spawn_meteor,
     ))
     .add_systems(Update, (
-        player_movement
+        player_movement,
+        confine_player_movement
     ))
     .run();
 }
 
 
 #[derive(Component)]
-struct Player {}
+pub struct Player {}
 
 fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
@@ -93,5 +94,36 @@ fn player_movement(keyboard_input:
         }
 
         transform.translation += direction * PLAYER_SPEED * time.delta_secs();
+    }
+}
+
+pub fn confine_player_movement(
+    mut player_query: Query<&mut Transform, With<Player>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+) {
+    if let Ok(mut player_transform) = player_query.get_single_mut() {
+        let window = window_query.get_single().unwrap();
+
+        let x_min = 0.0 - window.width() / 4.0;
+        let x_max = 0.0 + window.width() / 4.0;
+        let _y_min = 0.0; //ni vazno ker se premika samo levo in desno
+        let _y_max = 0.0;
+
+        let mut translation = player_transform.translation;
+
+        // Bound the player x position
+        if translation.x < x_min {
+            translation.x = x_min;
+        } else if translation.x > x_max {
+            translation.x = x_max;
+        }
+        // Bound the players y position.
+        // if translation.y < y_min {
+        //     translation.y = y_min;
+        // } else if translation.y > y_max {
+        //     translation.y = y_max;
+        // }
+
+        player_transform.translation = translation;
     }
 }
