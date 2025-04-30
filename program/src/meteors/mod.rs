@@ -11,7 +11,6 @@ pub struct MeteorPlugin;
  impl Plugin for MeteorPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<MeteorSpawnTimer>();
-        // app.add_systems(Startup, spawn_meteor);
         app.add_systems(Update, (tick_meteor_spawn_timer, spawn_meteors_over_time));
         app.add_systems(Update, meteor_movement);
         app.add_systems(Update, meteor_despawn);
