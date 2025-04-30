@@ -20,7 +20,6 @@ fn main() {
             }),
             ..Default::default()
         }))
-    //)
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
     .add_systems(Startup, spawn_camera)
