@@ -45,17 +45,8 @@ pub fn player_movement(keyboard_input:
 
 pub fn confine_player_movement(
     mut player_query: Query<&mut Transform, With<Player>>,
-    // window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
-        // let window = window_query.get_single().unwrap();
-
-        // let x_min = 0.0 - window.width() / 4.0;
-        // let x_max = 0.0 + window.width() / 4.0;
-        // let _y_min = 0.0; //ni vazno ker se premika samo levo in desno
-        // let _y_max = 0.0;
-
-        // Zdej premikam na absolutno širino.
         let x_min = 0.0 - 256.;
         let x_max = 0.0 + 256.;
 
@@ -67,12 +58,6 @@ pub fn confine_player_movement(
         } else if translation.x > x_max {
             translation.x = x_max;
         }
-        // Bound the players y position.
-        // if translation.y < y_min {
-        //     translation.y = y_min;
-        // } else if translation.y > y_max {
-        //     translation.y = y_max;
-        // }
 
         player_transform.translation = translation;
     }
