@@ -32,10 +32,10 @@ pub fn player_movement(keyboard_input:
     if let Ok(mut transform) = player_query.get_single_mut() {
         let mut direction = Vec3::ZERO;
 
-        if keyboard_input.pressed(KeyCode::KeyD) {
+        if keyboard_input.pressed(KeyCode::KeyD) || keyboard_input.pressed(KeyCode::ArrowRight) {
             direction += Vec3::new(1.0, 0.0, 0.0)
         }
-        if keyboard_input.pressed(KeyCode::KeyA) {
+        if keyboard_input.pressed(KeyCode::KeyA) || keyboard_input.pressed(KeyCode::ArrowLeft) {
             direction += Vec3::new(-1.0, 0.0, 0.0)
         }
 
@@ -45,15 +45,19 @@ pub fn player_movement(keyboard_input:
 
 pub fn confine_player_movement(
     mut player_query: Query<&mut Transform, With<Player>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
+    // window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     if let Ok(mut player_transform) = player_query.get_single_mut() {
-        let window = window_query.get_single().unwrap();
+        // let window = window_query.get_single().unwrap();
 
-        let x_min = 0.0 - window.width() / 4.0;
-        let x_max = 0.0 + window.width() / 4.0;
-        let _y_min = 0.0; //ni vazno ker se premika samo levo in desno
-        let _y_max = 0.0;
+        // let x_min = 0.0 - window.width() / 4.0;
+        // let x_max = 0.0 + window.width() / 4.0;
+        // let _y_min = 0.0; //ni vazno ker se premika samo levo in desno
+        // let _y_max = 0.0;
+
+        // Zdej premikam na absolutno širino.
+        let x_min = 0.0 - 256.;
+        let x_max = 0.0 + 256.;
 
         let mut translation = player_transform.translation;
 
