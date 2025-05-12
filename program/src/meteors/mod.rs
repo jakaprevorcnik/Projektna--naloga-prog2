@@ -14,5 +14,6 @@ pub struct MeteorPlugin;
         app.add_systems(Update, (tick_meteor_spawn_timer, spawn_meteors_over_time));
         app.add_systems(Update, meteor_movement);
         app.add_systems(Update, meteor_despawn);
+        app.add_systems(Update, check_collsion_meteor_player_rough);
     }
  }

@@ -3,10 +3,19 @@ use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
 use crate::meteors::components::*;
+use crate::player::components::*;
 
 use super::resources::MeteorSpawnTimer;
 
 pub const METEOR_SPEED: f32 = 100.0;
+
+// To je radij približno včrtanega kroga.
+// Ko bo collision detection s pravimi točkami in
+// bo program najprej preveril za kroge, bova samo povečala
+// ta radij, da bo vsaj toliko, da zaobjame cel meteor,
+// in dodala dodatno preverjanje za večkotnike za tiste, ki so dovolj blizu.
+pub const METEOR_RADIUS: f32 = 102.0;
+
 
 
 pub fn tick_meteor_spawn_timer(
@@ -26,7 +35,8 @@ pub fn spawn_meteors_over_time(
 
             let random_scale = random::<f32>() * 0.5 + 0.5;
             let random_x = random::<f32>() * 512.0 - 256.; 
-            let meteor_y = window.height() / 2.0 + 211. * random_scale / 2.0; // 215 nej bi bila višina originalne slike meteorja. Da se pojavi lepše.
+            let meteor_y = window.height() / 2.0 + 215. * random_scale / 2.0; // 211 nej bi bila višina originalne slike meteorja. Da se pojavi lepše.
+            // Te naračunane float-e bi lahko (morala) še dati v konstante ...
         
             commands.spawn(
                 (
@@ -35,7 +45,9 @@ pub fn spawn_meteors_over_time(
                         ..Default::default()
                     },
                     Transform::from_xyz(random_x, meteor_y, 0.0).with_scale(Vec3::splat(random_scale)),
-                    Meteor {},
+                    Meteor {
+                        radij : METEOR_RADIUS * random_scale
+                    },
                 )
             );            
         }
@@ -69,4 +81,55 @@ pub fn meteor_despawn(
             commands.entity(meteor_entity).despawn();
         }
     }
+}
+
+
+
+
+// Ali naj bo collision system tukaj ali pri player-ju?
+// Ali kaj pridobiva na učinkovitosti, če hkrati preverjava collision z metki (in posodablajava health)
+// Zaenkrat je aproksimacija: meteorji-krogi in player-pravokotnik.
+// Glej https://www.jeffreythompson.org/collision-detection/circle-rect.php, ta algoritem je.
+pub fn check_collsion_meteor_player_rough(
+    // mut commands: Commands,
+    mut meteor_query: Query<(Entity, &Transform, &Meteor), With<Meteor>>,
+    player_query: Query<&Transform, With<Player>>
+) {
+    if let Ok(player_transform) = player_query.get_single() {
+        let levi_rob = player_transform.translation.x - PLAYER_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
+        let desni_rob = player_transform.translation.x + PLAYER_WIDTH / 4.0;
+        let zgornji_rob = player_transform.translation.y + PLAYER_HEIGHT / 4.0;
+        let spodnji_rob = player_transform.translation.y - PLAYER_WIDTH / 4.0;
+        
+        for (meteor_entity, meteor_tranform, meteor) in meteor_query.iter_mut() {
+            let met_x0 = meteor_tranform.translation.x;
+            let met_y0 = meteor_tranform.translation.y; // koordinati središča
+
+            let mut testX = met_x0;
+            let mut testY = met_y0;
+
+            if met_x0 < levi_rob {
+                testX = levi_rob
+            } else if met_x0 > desni_rob {
+                testX = desni_rob
+            }
+            if met_y0 < spodnji_rob {
+                testY = spodnji_rob
+            } else if met_y0 > zgornji_rob {
+                testY = zgornji_rob
+            } 
+
+            let distX = met_x0 - testX;
+            let distY = met_y0 - testY;
+            let distance_square = (distX*distX) + (distY*distY);
+
+            if distance_square <= meteor.radij * meteor.radij {
+                println!("Zadet si bil.")
+            }
+            // Zamujam, tako da ni zrihtano nič. Tako da je še za zlepšat tudi to, kar je napisano. V splošnem pa itak še milijon za premislt.
+            // Vem, da je print slabo, ampak zdele nimam časa ugotavlat, kaj je dejansko treba narest.          
+    
+        }
+    }
+
 }
