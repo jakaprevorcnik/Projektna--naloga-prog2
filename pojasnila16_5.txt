@@ -1,0 +1,7 @@
+Dodala sem GameOver event in naredila datoteki events.rs in systems.rs zraven main-a. 
+GameOver event še ni zares uporaben, ker nimava še score-a. Sta pa zdej dva state-a: Game state in GameOver state. 
+Ki je zaenkrat zasilen nek state, v katerem zasilno piše GAME OVER in da pritisneš space. 
+Systems za GameOver state so v src/systems.rs trenutno. In ta cel osnovni collision 
+detection je pr player/systems.rs zdej (premaknjen iz mape meteors). 
+Kodo sem pustila kot zmazek, run condition-i in plugin-i so katastrofa, ampak za silo bo.
+Zbriši ta file, ko boš naslednji commit naredu. :)
