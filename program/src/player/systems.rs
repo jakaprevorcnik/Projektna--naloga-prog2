@@ -152,3 +152,27 @@ pub fn bullet_movement (
         bullet_transform.translation += bullet_direction * BULLET_SPEED * time.delta_secs();
     }
 }
+
+pub fn bullet_meteor_collision_system(
+    mut commands: Commands,
+    bullet_query: Query<(Entity, &Transform), With<Bullet>>,
+    meteor_query: Query<(Entity, &Transform), With<Meteor>>,
+) {
+    let hit_radius = 30.0; // Tune this based on your sprite sizes
+
+    for (bullet_entity, bullet_transform) in bullet_query.iter() {
+        let bullet_pos = bullet_transform.translation.truncate();
+
+        for (meteor_entity, meteor_transform) in meteor_query.iter() {
+            let meteor_pos = meteor_transform.translation.truncate();
+
+            let distance = bullet_pos.distance(meteor_pos);
+
+            if distance < hit_radius {
+                commands.entity(bullet_entity).despawn();
+                commands.entity(meteor_entity).despawn();
+                break;
+            }
+        }
+    }
+}

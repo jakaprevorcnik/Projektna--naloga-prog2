@@ -21,7 +21,8 @@ impl Plugin for PlayerPlugin {
         app.add_systems(Update, (
             check_collsion_meteor_player_rough,
             shoot_bullet,
-            bullet_movement
+            bullet_movement,
+            bullet_meteor_collision_system
         ));
     }
 }
