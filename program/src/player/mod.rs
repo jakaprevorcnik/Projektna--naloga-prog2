@@ -18,6 +18,10 @@ impl Plugin for PlayerPlugin {
             confine_player_movement
 
         ));
-        app.add_systems(Update, check_collsion_meteor_player_rough);
+        app.add_systems(Update, (
+            check_collsion_meteor_player_rough,
+            shoot_bullet,
+            bullet_movement
+        ));
     }
 }

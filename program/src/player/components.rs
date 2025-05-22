@@ -6,3 +6,6 @@ pub const PLAYER_WIDTH: f32 = 100.;
 
 #[derive(Component)]
 pub struct Player {}
+
+#[derive(Component)]
+pub struct Bullet{}
