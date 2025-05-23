@@ -6,6 +6,7 @@ use crate::player::components::*;
 use crate::meteors::components::*;
 
 pub const PLAYER_SPEED: f32 = 500.0;
+pub const BULLET_SPEED: f32 = 700.0;
 
 pub fn spawn_player(
     mut commands: Commands,
@@ -117,4 +118,61 @@ pub fn check_collsion_meteor_player_rough(
         }
     }
 
+}
+
+pub fn shoot_bullet(keyboard_input: 
+    Res<ButtonInput<KeyCode>>,
+    player_query: Query<&Transform, With<Player>>,
+    asset_server: Res<AssetServer>,
+    mut commands: Commands
+){
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        let ship_transform = player_query.single();
+        commands.spawn((
+            Sprite {
+                image: asset_server.load("sprites/spaceMissiles_015.png"),
+                        ..Default::default()
+            },
+            Transform::from_xyz(
+                ship_transform.translation.x,
+                ship_transform.translation.y + 40.0,
+                0.0,
+                ),
+            Bullet{}
+        ));
+    }
+}
+
+pub fn bullet_movement (
+    mut meteor_query: Query<(&mut Transform, &Bullet)>, 
+    time: Res<Time>
+) {
+    for (mut bullet_transform, bullet) in meteor_query.iter_mut() {
+        let bullet_direction = Vec3::new(0.0, 1.0, 0.0);
+        bullet_transform.translation += bullet_direction * BULLET_SPEED * time.delta_secs();
+    }
+}
+
+pub fn bullet_meteor_collision_system(
+    mut commands: Commands,
+    bullet_query: Query<(Entity, &Transform), With<Bullet>>,
+    meteor_query: Query<(Entity, &Transform), With<Meteor>>,
+) {
+    let hit_radius = 30.0; // Tune this based on your sprite sizes
+
+    for (bullet_entity, bullet_transform) in bullet_query.iter() {
+        let bullet_pos = bullet_transform.translation.truncate();
+
+        for (meteor_entity, meteor_transform) in meteor_query.iter() {
+            let meteor_pos = meteor_transform.translation.truncate();
+
+            let distance = bullet_pos.distance(meteor_pos);
+
+            if distance < hit_radius {
+                commands.entity(bullet_entity).despawn();
+                commands.entity(meteor_entity).despawn();
+                break;
+            }
+        }
+    }
 }
