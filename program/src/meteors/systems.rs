@@ -6,7 +6,7 @@ use crate::meteors::components::*;
 
 use super::resources::MeteorSpawnTimer;
 
-pub const METEOR_SPEED: f32 = 100.0;
+pub const METEOR_SPEED: f32 = 500.0;
 
 // To je radij približno včrtanega kroga.
 // Ko bo collision detection s pravimi točkami in

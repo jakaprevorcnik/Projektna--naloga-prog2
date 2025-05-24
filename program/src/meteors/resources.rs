@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub const METEOR_SPAWN_TIME: f32 = 3.0;
+pub const METEOR_SPAWN_TIME: f32 = 1.0;
 
 #[derive(Resource)]
 pub struct MeteorSpawnTimer {
