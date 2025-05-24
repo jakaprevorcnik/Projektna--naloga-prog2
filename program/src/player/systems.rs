@@ -176,3 +176,12 @@ pub fn bullet_meteor_collision_system(
         }
     }
 }
+
+pub fn despawn_all_bullets(
+    mut commands: Commands,
+    mut bullet_query: Query<Entity, With<Bullet>>     
+) {
+    for bullet_entity in bullet_query.iter() {
+        commands.entity(bullet_entity).despawn();
+    }
+}

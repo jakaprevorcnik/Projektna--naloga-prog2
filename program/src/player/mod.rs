@@ -23,6 +23,7 @@ impl Plugin for PlayerPlugin {
             shoot_bullet,
             bullet_movement,
             bullet_meteor_collision_system
-        ));
+        ).run_if(in_state(AppState::Game)));
+        app.add_systems(OnEnter(AppState::GameOver), despawn_all_bullets);
     }
 }
