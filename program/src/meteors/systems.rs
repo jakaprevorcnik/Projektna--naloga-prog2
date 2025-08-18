@@ -13,7 +13,14 @@ pub const METEOR_SPEED: f32 = 500.0;
 // bo program najprej preveril za kroge, bova samo povečala
 // ta radij, da bo vsaj toliko, da zaobjame cel meteor,
 // in dodala dodatno preverjanje za večkotnike za tiste, ki so dovolj blizu.
-pub const METEOR_RADIUS: f32 = 102.0;
+// pub const METEOR_RADIUS: f32 = 102.0;
+pub const METEOR_RADIUS: f32 = 107.5;
+
+// ARRAY ALI VECTOR ???
+const OGLISCA_METEORJA_SLIKA: [Vec2; 10] = [Vec2::new(35., -204.), Vec2::new(105., -211.),
+     Vec2::new(173., -191.), Vec2::new(211., -145.), Vec2::new(215., -74.), Vec2::new(171., -19.), 
+     Vec2::new(111.5, 0.), Vec2::new(37., -23.5), Vec2::new(0., -72.), Vec2::new(3.5, -136.)];
+const CENTER_METEORJA_SLIKA: Vec2 = Vec2::new(107.5, -105.5);
 
 
 pub fn despawn_all_meteors(
@@ -44,6 +51,10 @@ pub fn spawn_meteors_over_time(
             let random_x = random::<f32>() * 512.0 - 256.; 
             let meteor_y = window.height() / 2.0 + 215. * random_scale / 2.0; // 211 nej bi bila višina originalne slike meteorja. Da se pojavi lepše.
             // Te naračunane float-e bi lahko (morala) še dati v konstante ...
+            let kot = (random::<f32>() * 360.).to_radians();
+
+            let oglisca = create_meteor_vertex_array(kot, random_scale);
+            let oglisca_pozicija = calculate_starting_meteor_vertex_position(&oglisca, Vec2::new(random_x, meteor_y));
         
             commands.spawn(
                 (
@@ -51,22 +62,54 @@ pub fn spawn_meteors_over_time(
                         image: asset_server.load("sprites/spaceMeteors_001.png"),
                         ..Default::default()
                     },
-                    Transform::from_xyz(random_x, meteor_y, 0.0).with_scale(Vec3::splat(random_scale)),
+                    Transform::from_xyz(random_x, meteor_y, 0.0).with_scale(Vec3::splat(random_scale))
+                        .with_rotation(Quat::from_rotation_z(kot)),
                     Meteor {
-                        radij : METEOR_RADIUS * random_scale
+                        radij : METEOR_RADIUS * random_scale,
+                        oglisca_izhodisce : oglisca,
+                        kot : kot,
+                        oglisca_pozicija : oglisca_pozicija,
                     },
                 )
             );            
         }
     }
 
+fn create_meteor_vertex_array(angle: f32, scale: f32) -> [Vec2; 10] {
+    let mut oglisca_array: [Vec2; 10] = [Vec2::new(0., 0.); 10];
+    for (i, vec) in OGLISCA_METEORJA_SLIKA.iter().enumerate() {
+        oglisca_array[i] = Vec2::from_angle(angle).rotate((vec - CENTER_METEORJA_SLIKA) * scale)
+    };
+    oglisca_array
+}
+
+fn calculate_starting_meteor_vertex_position(vertex_array: &[Vec2; 10], pozicija: Vec2) -> [Vec2; 10] {
+    let mut oglisca_pozicija = [Vec2::new(0., 0.); 10];
+    for (i, vec) in vertex_array.iter().enumerate() {
+        oglisca_pozicija[i] = vec + pozicija
+    };
+    oglisca_pozicija
+}
+
+pub fn meteor_calculate_vertex_position(
+    mut meteor_query: Query<(&mut Transform, &Meteor)>, 
+) {
+    for (meteor_transform, meteor) in meteor_query.iter_mut() {
+        for mut vec in meteor.oglisca_pozicija {
+            vec += meteor_transform.translation.xy()
+        }
+    }
+}
+
+
+
 
 pub fn meteor_movement(
     mut meteor_query: Query<(&mut Transform, &Meteor)>, 
     time: Res<Time>
 ) {
+    let meteor_direction = Vec3::new(0.0, -1.0, 0.0);
     for (mut meteor_transform, meteor) in meteor_query.iter_mut() {
-        let meteor_direction = Vec3::new(0.0, -1.0, 0.0);
         meteor_transform.translation += meteor_direction * METEOR_SPEED * time.delta_secs();
     }
 }

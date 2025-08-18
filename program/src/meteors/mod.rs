@@ -13,7 +13,7 @@ pub struct MeteorPlugin;
     fn build(&self, app: &mut App) {
         app.init_resource::<MeteorSpawnTimer>();
         app.add_systems(Update, 
-            (tick_meteor_spawn_timer, spawn_meteors_over_time, meteor_movement, meteor_despawn)
+            (tick_meteor_spawn_timer, spawn_meteors_over_time, meteor_movement, meteor_despawn, meteor_calculate_vertex_position)
             .run_if(in_state(AppState::Game)));
         app.add_systems(OnEnter(AppState::GameOver), despawn_all_meteors);
     }
