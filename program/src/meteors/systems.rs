@@ -8,12 +8,7 @@ use super::resources::MeteorSpawnTimer;
 
 pub const METEOR_SPEED: f32 = 500.0;
 
-// To je radij približno včrtanega kroga.
-// Ko bo collision detection s pravimi točkami in
-// bo program najprej preveril za kroge, bova samo povečala
-// ta radij, da bo vsaj toliko, da zaobjame cel meteor,
-// in dodala dodatno preverjanje za večkotnike za tiste, ki so dovolj blizu.
-// pub const METEOR_RADIUS: f32 = 102.0;
+// To je radij približno očrtanega kroga.
 pub const METEOR_RADIUS: f32 = 107.5;
 
 // ARRAY ALI VECTOR ???
@@ -34,9 +29,10 @@ pub fn despawn_all_meteors(
 
 pub fn tick_meteor_spawn_timer(
     mut meteor_spawn_timer: ResMut<MeteorSpawnTimer>,
-    time: Res<Time>) {
-        meteor_spawn_timer.timer.tick(time.delta());
-    }
+    time: Res<Time>
+) {
+    meteor_spawn_timer.timer.tick(time.delta());
+}
 
 pub fn spawn_meteors_over_time(
     mut commands: Commands,
@@ -54,7 +50,6 @@ pub fn spawn_meteors_over_time(
             let kot = (random::<f32>() * 360.).to_radians();
 
             let oglisca = create_meteor_vertex_array(kot, random_scale);
-            let oglisca_pozicija = calculate_starting_meteor_vertex_position(&oglisca, Vec2::new(random_x, meteor_y));
         
             commands.spawn(
                 (
@@ -67,8 +62,6 @@ pub fn spawn_meteors_over_time(
                     Meteor {
                         radij : METEOR_RADIUS * random_scale,
                         oglisca_izhodisce : oglisca,
-                        kot : kot,
-                        oglisca_pozicija : oglisca_pozicija,
                     },
                 )
             );            
@@ -83,23 +76,6 @@ fn create_meteor_vertex_array(angle: f32, scale: f32) -> [Vec2; 10] {
     oglisca_array
 }
 
-fn calculate_starting_meteor_vertex_position(vertex_array: &[Vec2; 10], pozicija: Vec2) -> [Vec2; 10] {
-    let mut oglisca_pozicija = [Vec2::new(0., 0.); 10];
-    for (i, vec) in vertex_array.iter().enumerate() {
-        oglisca_pozicija[i] = vec + pozicija
-    };
-    oglisca_pozicija
-}
-
-pub fn meteor_calculate_vertex_position(
-    mut meteor_query: Query<(&mut Transform, &Meteor)>, 
-) {
-    for (meteor_transform, meteor) in meteor_query.iter_mut() {
-        for mut vec in meteor.oglisca_pozicija {
-            vec += meteor_transform.translation.xy()
-        }
-    }
-}
 
 
 

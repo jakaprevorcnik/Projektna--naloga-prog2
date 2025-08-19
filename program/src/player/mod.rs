@@ -16,10 +16,8 @@ impl Plugin for PlayerPlugin {
         app.add_systems(Update, (
             player_movement,
             confine_player_movement
-
         ));
         app.add_systems(Update, (
-            // check_collsion_meteor_player_rough,
             check_collision_meteor_player,
             shoot_bullet,
             bullet_movement,
