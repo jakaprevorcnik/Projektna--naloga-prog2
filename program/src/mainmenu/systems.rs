@@ -78,3 +78,30 @@ pub fn despawn_mainmenu_text (
     commands.entity(text_entity).despawn();
   }
 }
+
+
+
+pub fn spawn_main_menu_screen(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) {
+    commands.spawn(
+        (
+            Sprite{
+                image: asset_server.load("sprites/Space Rangers - Main Menu.png"),
+                ..Default::default()
+            },
+            Transform::from_xyz(0.0, 0.0, -10.),
+            MenuImage
+        )
+    );
+}
+
+pub fn despawn_main_menu_screen_image(
+    mut commands: Commands,
+    mut image_query: Query<Entity, With<MenuImage>>     
+) {
+    for image in image_query.iter() {
+        commands.entity(image).despawn();
+    }
+}

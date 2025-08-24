@@ -104,7 +104,6 @@ pub fn despawn_score_game_text(
 
 
 
-
 // SAT convex polygon collision detection
 pub fn sat_collision_detection(veckotnik1: &Vec<Vec2>, veckotnik2: &Vec<Vec2>) -> bool { // TIPI ?!?!?!
     
