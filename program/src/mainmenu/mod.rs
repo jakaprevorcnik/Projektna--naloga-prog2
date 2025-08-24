@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 
 mod systems;
-mod resources;
 mod components;
 
 use systems::*;
@@ -18,6 +17,6 @@ impl Plugin for MainMenuPlugin {
         app.add_systems(OnEnter(AppState::MainMenu), (display_mainmenu_text, display_score_mainmenu_text));
         app.add_systems(Update, (tick_vh_text_timers, gameover_text_toggle_visibility)
             .run_if(in_state(AppState::MainMenu))); //to je vse zdaj skupaj nametano. Verjetno bi morala narediti skupen UI modul in plugin.
-        app.add_systems(OnEnter(AppState::Game), despawn_mainmenu_text);
+        app.add_systems(OnExit(AppState::MainMenu), despawn_mainmenu_text);
     }
 }
