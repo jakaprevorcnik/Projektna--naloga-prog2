@@ -9,18 +9,6 @@ pub fn display_mainmenu_text(
   asset_server: Res<AssetServer>,
 ) {
     commands.spawn((
-        Text2d::new("SPACE RANGERS"),
-        TextFont {
-            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
-            font_size: 67.0,
-            ..default()
-        },
-        TextColor::WHITE,
-        Transform::from_xyz(0.0, 100., 0.0),
-        MainMenuText,
-    ));
-
-    commands.spawn((
         Text2d::new("Press space to start new game"),
         TextFont {
             font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
@@ -38,7 +26,7 @@ pub fn display_mainmenu_text(
         Text2d::new("Work in progress"),
         TextFont {
             font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
-            font_size: 50.0,
+            font_size: 40.0,
             ..default()
         },
         TextColor::WHITE,
