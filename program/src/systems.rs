@@ -9,7 +9,37 @@ pub fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
   }
 
+  
 
+// Kje in kako naj bo tale funkcija, še ne vem.
+pub fn toggle_states(
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    app_state: Res<State<AppState>>,
+    mut simulation_state_next_state: ResMut<NextState<AppState>>,
+) {
+    match *app_state.get() {
+        AppState::MainMenu => {
+            if keyboard_input.just_pressed(KeyCode::Space) {
+                simulation_state_next_state.set(AppState::Game);
+                println!("New game started.");
+            }
+        }
+        AppState::GameOver => {
+            if keyboard_input.just_pressed(KeyCode::Space) {
+                simulation_state_next_state.set(AppState::Game);
+                println!("New game started.");
+            }
+
+            if keyboard_input.just_pressed(KeyCode::Escape) {
+                simulation_state_next_state.set(AppState::MainMenu);
+                println!("Returned to main menu.");
+            }
+        }
+        AppState::Game => {} // Ali naj bi obstajala možnost za return na main menu?
+    }
+}
+
+// Kle nej bi ble sam menjave in ta komunikacija.
 
 pub fn handle_game_over(
     mut game_over_event_reader: EventReader<GameOver>,
@@ -19,19 +49,6 @@ pub fn handle_game_over(
         println!("Your final score is: {}", event.score.to_string());
         app_state_next_state.set(AppState::GameOver);
         println!("Entered AppState::GameOver");
-    }
-}
-
-
-// Kle nej bi ble sam menjave in ta komunikacija. Ostalo je v gameover, trenutno.
-
-pub fn handle_main_menu(
-    mut game_over_event_reader: EventReader<MainMenu>,
-    mut app_state_next_state: ResMut<NextState<AppState>>,
-) {
-    for event in game_over_event_reader.read() {
-        app_state_next_state.set(AppState::MainMenu);
-        println!("Entered AppState::MainMenu");
     }
 }
 

@@ -3,24 +3,6 @@ use bevy::prelude::*;
 use crate::gameover::components::*;
 use super::resources::{VisibleTextTimer, HiddenTextTimer};
 
-use crate::AppState;
-
-
-
-// Kje in kako naj bo tale funkcija, še ne vem.
-pub fn game_over_to_game(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    // app_state: Res<State<AppState>>,
-    mut simulation_state_next_state: ResMut<NextState<AppState>>,
-) {
-    // if *app_state.get() == AppState::GameOver {
-        if keyboard_input.just_pressed(KeyCode::Space) {
-            simulation_state_next_state.set(AppState::Game);
-            println!("New game started.");
-        }
-    // }
-}
-
 
 pub fn display_gameover_text(
   mut commands: Commands,
@@ -128,6 +110,7 @@ pub fn gameover_text_toggle_visibility (
     mut visible_text_timer: ResMut<VisibleTextTimer>,
     mut hidden_text_timer: ResMut<HiddenTextTimer>,
 ) {
+    // Ali moram narediti poseben system, ki unpause-a oba timerja ob vstopu v state?
     // spawn-a se kot visible
     for mut visibility in text_query.iter_mut() {
         match *visibility {

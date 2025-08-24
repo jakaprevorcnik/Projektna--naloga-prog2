@@ -3,13 +3,15 @@ mod meteors;
 pub mod events;
 mod systems;
 mod gameover;
+mod mainmenu;
 
 
 use bevy::prelude::*;
+use mainmenu::MainMenuPlugin;
 use meteors::MeteorPlugin;
 use player::PlayerPlugin;
 use gameover::GameOverPlugin;
-use events::{GameOver, MainMenu};
+use events::GameOver;
 use crate::systems::*;
 
 
@@ -28,13 +30,11 @@ fn main() {
         }))
     .init_state::<AppState>()
     .add_event::<GameOver>()
-    .add_event::<MainMenu>()
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
-    .add_plugins(GameOverPlugin)
+    .add_plugins((GameOverPlugin, MainMenuPlugin))
     .add_systems(Startup, spawn_camera)
-    // Dodala 16. 5., ni urejeno ...
-    .add_systems(Update, (handle_game_over, handle_main_menu))
+    .add_systems(Update, (toggle_states, handle_game_over))
     .run();
 }
 
@@ -42,8 +42,7 @@ fn main() {
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
     #[default]
-    // MainMenu,
+    MainMenu,
     Game,
     GameOver,
-    MainMenu //zaenkrat še ni default, ker ni še nič narejeno
 }
