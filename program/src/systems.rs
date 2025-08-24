@@ -9,7 +9,7 @@ pub fn spawn_camera(mut commands: Commands) {
     commands.spawn(Camera2d);
   }
 
-  
+
 
 // Kje in kako naj bo tale funkcija, še ne vem.
 pub fn toggle_states(
@@ -50,6 +50,55 @@ pub fn handle_game_over(
         app_state_next_state.set(AppState::GameOver);
         println!("Entered AppState::GameOver");
     }
+}
+
+
+#[derive(Component)]
+pub struct GameText;
+
+pub fn display_score_game_text(
+  mut commands: Commands,
+  asset_server: Res<AssetServer>,
+) {
+    // še ne obstaja pravi score
+    let score: u32 = 0;
+    let high_score: u32 = 0;
+    
+
+    commands.spawn((
+        Text2d::new(format!("Your score:\n{}", score)),
+        TextFont {
+            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+            font_size: 30.0,
+            ..default()
+        },
+        TextColor::WHITE,
+        TextLayout::new_with_justify(JustifyText::Right),
+        Transform::from_xyz(-384., 48., -1.), //Ne vem, kako narediti transform glede na desen rob.
+        GameText,
+    ));  
+
+        commands.spawn((
+        Text2d::new(format!("High score:\n{}", high_score)),
+        TextFont {
+            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+            font_size: 30.0,
+            ..default()
+        },
+        TextColor::WHITE,
+        TextLayout::new_with_justify(JustifyText::Right),
+        Transform::from_xyz(-384., -48., -1.),
+        GameText,
+    ));  
+}
+
+pub fn despawn_score_game_text(
+  mut commands: Commands,
+  text_query: Query<Entity, With<GameText>>
+) {
+  for text_entity in text_query.iter() {
+    commands.entity(text_entity).despawn();
+  }
 }
 
 

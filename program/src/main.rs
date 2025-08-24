@@ -4,6 +4,7 @@ pub mod events;
 mod systems;
 mod gameover;
 mod mainmenu;
+pub mod resources;
 
 
 use bevy::prelude::*;
@@ -35,6 +36,9 @@ fn main() {
     .add_plugins((GameOverPlugin, MainMenuPlugin))
     .add_systems(Startup, spawn_camera)
     .add_systems(Update, (toggle_states, handle_game_over))
+    //neurejeno
+    .add_systems(OnEnter(AppState::Game), display_score_game_text)
+    .add_systems(OnExit(AppState::Game), despawn_score_game_text)
     .run();
 }
 

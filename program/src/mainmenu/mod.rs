@@ -20,3 +20,5 @@ impl Plugin for MainMenuPlugin {
         app.add_systems(OnExit(AppState::MainMenu), despawn_mainmenu_text);
     }
 }
+
+// Je za združit v UI/state modul z gameover in pa s systemi v crate::systems za display score-a in highscore-a.
