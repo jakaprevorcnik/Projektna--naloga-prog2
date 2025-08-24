@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::gameover::components::*;
-use super::resources::ToggleTextTimer;
+use super::resources::{VisibleTextTimer, HiddenTextTimer};
 
 use crate::AppState;
 
@@ -51,8 +51,56 @@ pub fn display_gameover_text(
         GameOverText,
         BlinkingText,
     ));
+
+    commands.spawn((
+        Text2d::new("Press Esc to return to the main menu"),
+        TextFont {
+            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+            font_size: 22.0,
+            ..default()
+        },
+        TextColor::WHITE,
+        Transform::from_xyz(0.0, -280., 0.0),
+        Visibility::Visible,
+        GameOverText,
+        BlinkingText,
+    ));
 }
-// Manjka navodilo za gameover, ko bo gameover in izpis score-a na ekranu. Na konzolo jaz ne bi nič pisala zares.
+// Na konzolo jaz ne bi nič pisala zares, ko bo ostalo urejeno.
+
+pub fn display_score_gameover_text(
+  mut commands: Commands,
+  asset_server: Res<AssetServer>,
+) {
+    // še ne obstaja pravi score
+    let score: u32 = 0;
+    let high_score: u32 = 0;
+
+    commands.spawn((
+        Text2d::new(format!("Your score: {}", score)),
+        TextFont {
+            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+            font_size: 40.0,
+            ..default()
+        },
+        TextColor::WHITE,
+        Transform::from_xyz(0.0, 0., 0.0),
+        GameOverText,
+    ));
+
+    commands.spawn((
+        Text2d::new(format!("High score: {}", high_score)),
+        TextFont {
+            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+            font_size: 30.0,
+            ..default()
+        },
+        TextColor::WHITE,
+        Transform::from_xyz(0.0, -50., 0.0),
+        GameOverText,
+    ));  
+}
+// Poseben pogoj za NewHighScore, da potem namesto High score: ... izpiše "NEW HIGH SCORE!" mal na večje
 
 pub fn despawn_gameover_text (
   mut commands: Commands,
@@ -65,21 +113,41 @@ pub fn despawn_gameover_text (
 
 
 
-pub fn tick_toggle_text_timer(
-    mut toggle_text_timer: ResMut<ToggleTextTimer>,
+pub fn tick_vh_text_timers(
+    mut visible_text_timer: ResMut<VisibleTextTimer>,
+    mut hidden_text_timer: ResMut<HiddenTextTimer>,
     time: Res<Time>
 ) {
-    toggle_text_timer.timer.tick(time.delta());
+    visible_text_timer.timer.tick(time.delta());
+    hidden_text_timer.timer.tick(time.delta());
 }
 
 
 pub fn gameover_text_toggle_visibility (
     mut text_query: Query<&mut Visibility, With<BlinkingText>>,
-    toggle_text_timer: Res<ToggleTextTimer>
+    mut visible_text_timer: ResMut<VisibleTextTimer>,
+    mut hidden_text_timer: ResMut<HiddenTextTimer>,
 ) {
-    if toggle_text_timer.timer.finished() {
-        for mut visibility in text_query.iter_mut() {
-            visibility.toggle_visible_hidden();
-        };
+    // spawn-a se kot visible
+    for mut visibility in text_query.iter_mut() {
+        match *visibility {
+            Visibility::Visible => {
+                if visible_text_timer.timer.finished() {
+                    *visibility = Visibility::Hidden;
+                    visible_text_timer.timer.pause();
+                    hidden_text_timer.timer.reset();
+                    hidden_text_timer.timer.unpause();                    
+                }
+            }
+            Visibility::Hidden => {
+                if hidden_text_timer.timer.finished() {
+                    *visibility = Visibility::Visible;
+                    hidden_text_timer.timer.pause();
+                    visible_text_timer.timer.reset();
+                    visible_text_timer.timer.unpause();                    
+                }                
+            }
+            _ => {} // Visibility::Inherited
+        }
     }
 }

@@ -9,7 +9,7 @@ use bevy::prelude::*;
 use meteors::MeteorPlugin;
 use player::PlayerPlugin;
 use gameover::GameOverPlugin;
-use events::GameOver;
+use events::{GameOver, MainMenu};
 use crate::systems::*;
 
 
@@ -28,12 +28,13 @@ fn main() {
         }))
     .init_state::<AppState>()
     .add_event::<GameOver>()
+    .add_event::<MainMenu>()
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
     .add_plugins(GameOverPlugin)
     .add_systems(Startup, spawn_camera)
     // Dodala 16. 5., ni urejeno ...
-    .add_systems(Update, handle_game_over)
+    .add_systems(Update, (handle_game_over, handle_main_menu))
     .run();
 }
 
@@ -41,7 +42,8 @@ fn main() {
 #[derive(States, Debug, Clone, Copy, Eq, PartialEq, Hash, Default)]
 pub enum AppState {
     #[default]
-    // MainMenu, // trenutno še ne obstaja, drugače bo to default.
+    // MainMenu,
     Game,
     GameOver,
+    MainMenu //zaenkrat še ni default, ker ni še nič narejeno
 }

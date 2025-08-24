@@ -13,7 +13,7 @@ pub fn spawn_camera(mut commands: Commands) {
 
 pub fn handle_game_over(
     mut game_over_event_reader: EventReader<GameOver>,
-        mut app_state_next_state: ResMut<NextState<AppState>>,
+    mut app_state_next_state: ResMut<NextState<AppState>>,
 ) {
     for event in game_over_event_reader.read() {
         println!("Your final score is: {}", event.score.to_string());
@@ -25,6 +25,15 @@ pub fn handle_game_over(
 
 // Kle nej bi ble sam menjave in ta komunikacija. Ostalo je v gameover, trenutno.
 
+pub fn handle_main_menu(
+    mut game_over_event_reader: EventReader<MainMenu>,
+    mut app_state_next_state: ResMut<NextState<AppState>>,
+) {
+    for event in game_over_event_reader.read() {
+        app_state_next_state.set(AppState::MainMenu);
+        println!("Entered AppState::MainMenu");
+    }
+}
 
 
 
