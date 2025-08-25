@@ -3,10 +3,11 @@ use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
 use crate::meteors::components::*;
+use crate::resources::GameTime;
 
 use super::resources::MeteorSpawnTimer;
 
-pub const METEOR_SPEED: f32 = 500.0;
+pub const METEOR_SPEED: f32 = 300.0;
 
 // To je radij približno očrtanega kroga.
 pub const METEOR_RADIUS: f32 = 107.5;
@@ -82,11 +83,18 @@ fn create_meteor_vertex_array(angle: f32, scale: f32) -> [Vec2; 10] {
 
 pub fn meteor_movement(
     mut meteor_query: Query<(&mut Transform, &Meteor)>, 
-    time: Res<Time>
+    time: Res<Time>,
+    game_time: Res<GameTime>
 ) {
     let meteor_direction = Vec3::new(0.0, -1.0, 0.0);
-    for (mut meteor_transform, meteor) in meteor_query.iter_mut() {
-        meteor_transform.translation += meteor_direction * METEOR_SPEED * time.delta_secs();
+    
+    // Calculate dynamic speed: base speed + (50 speed increase every 30 seconds)
+    let time_intervals = game_time.get_time() / 30; // Every 30 seconds (half minute)
+    let speed_increase = time_intervals * 50;
+    let current_speed = METEOR_SPEED + speed_increase as f32;
+    
+    for (mut meteor_transform, _meteor) in meteor_query.iter_mut() {
+        meteor_transform.translation += meteor_direction * current_speed * time.delta_secs();
     }
 }
 

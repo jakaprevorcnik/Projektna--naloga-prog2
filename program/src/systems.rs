@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 use crate::events::*;
-
+use crate::resources::*;
 
 
 pub fn spawn_camera(mut commands: Commands) {
@@ -150,4 +150,12 @@ pub fn sat_collision_detection(veckotnik1: &Vec<Vec2>, veckotnik2: &Vec<Vec2>) -
     }
 
     return true
+}
+
+pub fn update_game_time( mut game_time: ResMut<GameTime>, time: Res<Time>) {
+    game_time.update(time.delta());
+}
+
+pub fn reset_game_time(mut game_time: ResMut<GameTime>) {
+    game_time.reset();
 }

@@ -2,7 +2,7 @@ pub mod player;
 mod meteors;
 pub mod events;
 mod systems;
-mod gameover;
+mod gameover; 
 mod mainmenu;
 pub mod resources;
 
@@ -13,6 +13,7 @@ use meteors::MeteorPlugin;
 use player::PlayerPlugin;
 use gameover::GameOverPlugin;
 use events::GameOver;
+use resources::GameTime;
 use crate::systems::*;
 
 
@@ -30,6 +31,7 @@ fn main() {
             ..Default::default()
         }))
     .init_state::<AppState>()
+    .init_resource::<GameTime>()
     .add_event::<GameOver>()
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
@@ -37,7 +39,8 @@ fn main() {
     .add_systems(Startup, spawn_camera)
     .add_systems(Update, (toggle_states, handle_game_over))
     //neurejeno
-    .add_systems(OnEnter(AppState::Game), display_score_game_text)
+    .add_systems(OnEnter(AppState::Game), (display_score_game_text, reset_game_time))
+    .add_systems(Update, update_game_time.run_if(in_state(AppState::Game)))
     .add_systems(OnExit(AppState::Game), despawn_score_game_text)
     .run();
 }
