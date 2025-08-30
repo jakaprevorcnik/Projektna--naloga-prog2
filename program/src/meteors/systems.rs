@@ -88,10 +88,10 @@ pub fn meteor_movement(
 ) {
     let meteor_direction = Vec3::new(0.0, -1.0, 0.0);
     
-    // Calculate dynamic speed: base speed + (50 speed increase every 30 seconds)
-    let time_intervals = game_time.get_time() / 30; // Every 30 seconds (half minute)
-    let speed_increase = time_intervals * 50;
-    let current_speed = METEOR_SPEED + speed_increase as f32;
+    
+    let time_intervals = game_time.get_time() / 30.0; 
+    let speed_increase = time_intervals * 50.0;
+    let current_speed = METEOR_SPEED + speed_increase;
     
     for (mut meteor_transform, _meteor) in meteor_query.iter_mut() {
         meteor_transform.translation += meteor_direction * current_speed * time.delta_secs();

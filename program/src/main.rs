@@ -13,7 +13,7 @@ use meteors::MeteorPlugin;
 use player::PlayerPlugin;
 use gameover::GameOverPlugin;
 use events::GameOver;
-use resources::GameTime;
+use resources::{GameTime, Score, HighScore};
 use crate::systems::*;
 
 
@@ -32,6 +32,8 @@ fn main() {
         }))
     .init_state::<AppState>()
     .init_resource::<GameTime>()
+    .init_resource::<Score>()
+    .init_resource::<HighScore>()
     .add_event::<GameOver>()
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
@@ -39,8 +41,8 @@ fn main() {
     .add_systems(Startup, spawn_camera)
     .add_systems(Update, (toggle_states, handle_game_over))
     //neurejeno
-    .add_systems(OnEnter(AppState::Game), (display_score_game_text, reset_game_time))
-    .add_systems(Update, update_game_time.run_if(in_state(AppState::Game)))
+    .add_systems(OnEnter(AppState::Game), (display_score_game_text, reset_game_time, reset_score))
+    .add_systems(Update, (update_game_time, update_score_with_time, update_score_display).run_if(in_state(AppState::Game)))
     .add_systems(OnExit(AppState::Game), despawn_score_game_text)
     .run();
 }

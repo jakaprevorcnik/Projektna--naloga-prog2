@@ -91,7 +91,9 @@ pub fn check_collision_meteor_player(
     mut commands: Commands,
     mut game_over_event_writer: EventWriter<GameOver>,
     mut meteor_query: Query<(&Transform, &Meteor), With<Meteor>>,
-    mut player_query: Query<(Entity, &Transform), With<Player>>
+    mut player_query: Query<(Entity, &Transform), With<Player>>,
+    score: Res<crate::resources::Score>,
+    mut high_score: ResMut<crate::resources::HighScore>,
 ) {
 if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
         let levi_rob = player_transform.translation.x - PLAYER_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
@@ -129,8 +131,15 @@ if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
                 if sat_collision_detection(&oglisca_ladje, &oglisca_meteorja) {
                     println!("Zadet si bil.");
                     commands.entity(player_entity).despawn();
-                    // score-a še nimava.
-                    game_over_event_writer.send(GameOver { score : 0 });                    
+                    
+                    let final_score = score.get_score();
+                    let is_new_high_score = high_score.update(final_score);
+                    
+                    if is_new_high_score {
+                        println!("NEW HIGH SCORE! {}", final_score);
+                    }
+                    
+                    game_over_event_writer.send(GameOver { score: final_score });                    
                 }
 
             }
@@ -203,7 +212,7 @@ pub fn bullet_movement (
     mut meteor_query: Query<(&mut Transform, &Bullet)>, 
     time: Res<Time>
 ) {
-    for (mut bullet_transform, bullet) in meteor_query.iter_mut() {
+    for (mut bullet_transform, _bullet) in meteor_query.iter_mut() {
         let bullet_direction = Vec3::new(0.0, 1.0, 0.0);
         bullet_transform.translation += bullet_direction * BULLET_SPEED * time.delta_secs();
     }
@@ -213,6 +222,7 @@ pub fn bullet_meteor_collision_system(
     mut commands: Commands,
     bullet_query: Query<(Entity, &Transform), With<Bullet>>,
     meteor_query: Query<(Entity, &Transform, &Meteor), With<Meteor>>,
+    mut score: ResMut<crate::resources::Score>,
 ) {
 for (bullet_entity, bullet_transform) in bullet_query.iter() {
         let levi_rob = bullet_transform.translation.x - BULLET_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
@@ -242,6 +252,11 @@ for (bullet_entity, bullet_transform) in bullet_query.iter() {
                 if sat_collision_detection(&oglisca_metka, &oglisca_meteorja) {
                     commands.entity(bullet_entity).despawn();
                     commands.entity(meteor_entity).despawn();
+                    
+                    // Add score for destroying meteor
+                    
+                    score.add_points(10);
+                    
                     break;                
                 }
 

@@ -53,13 +53,14 @@ pub fn display_gameover_text(
 pub fn display_score_gameover_text(
   mut commands: Commands,
   asset_server: Res<AssetServer>,
+  score: Res<crate::resources::Score>,
+  high_score: Res<crate::resources::HighScore>,
 ) {
-    // še ne obstaja pravi score
-    let score: u32 = 0;
-    let high_score: u32 = 0;
+    let current_score = score.get_score();
+    let high_score_value = high_score.get();
 
     commands.spawn((
-        Text2d::new(format!("Your score: {}", score)),
+        Text2d::new(format!("Your score: {}", current_score)),
         TextFont {
             font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
             font_size: 40.0,
@@ -70,17 +71,32 @@ pub fn display_score_gameover_text(
         GameOverText,
     ));
 
-    commands.spawn((
-        Text2d::new(format!("High score: {}", high_score)),
-        TextFont {
-            font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
-            font_size: 30.0,
-            ..default()
-        },
-        TextColor::WHITE,
-        Transform::from_xyz(0.0, -50., 0.0),
-        GameOverText,
-    ));  
+    // Check if this was a new high score
+    if current_score == high_score_value && current_score > 0 {
+        commands.spawn((
+            Text2d::new("NEW HIGH SCORE!"),
+            TextFont {
+                font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+                font_size: 50.0,
+                ..default()
+            },
+            TextColor(Color::linear_rgba(1.0, 0.8, 0.0, 1.0)), // Gold color
+            Transform::from_xyz(0.0, -50., 0.0),
+            GameOverText,
+        ));
+    } else {
+        commands.spawn((
+            Text2d::new(format!("High score: {}", high_score_value)),
+            TextFont {
+                font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
+                font_size: 30.0,
+                ..default()
+            },
+            TextColor::WHITE,
+            Transform::from_xyz(0.0, -50., 0.0),
+            GameOverText,
+        ));
+    }
 }
 // Poseben pogoj za NewHighScore, da potem namesto High score: ... izpiše "NEW HIGH SCORE!" mal na večje
 
