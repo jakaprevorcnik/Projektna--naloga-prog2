@@ -14,7 +14,7 @@ pub struct GameTime {
 #[derive(Resource)]
 pub struct Score {
     pub score: u32,
-    pub last_time_update: f32, // Track the last time we added time-based points
+    pub last_time_update: f32, 
 }
 
 #[derive(Resource)]
@@ -88,15 +88,13 @@ impl Score {
     pub fn update_score_with_gametime(&mut self, game_time: &GameTime) {
         let current_time = game_time.get_time();
         
-        // Check if 0.1 seconds have passed since last update
+       
         if current_time - self.last_time_update >= 0.1 {
-            // Calculate how many 0.1-second intervals have passed
+           
             let intervals_passed = ((current_time - self.last_time_update) / 0.1) as u32;
-            
-            // Add points for each interval
+           
             self.score += intervals_passed;
             
-            // Update the last time we added points
             self.last_time_update += (intervals_passed as f32) * 0.1;
         }
     }
@@ -141,4 +139,4 @@ fn save_high_score(score: u32) { // Shrani nov high score v datoteko highscore.t
     if let Err(e) = fs::write(HIGH_SCORE_FILE, score.to_string()) {
         eprintln!("Failed to save high score: {}", e);
     }
-}
+} //ce hocemo resetirat highscore ga samo nastavimo na 0 v highscore.txt

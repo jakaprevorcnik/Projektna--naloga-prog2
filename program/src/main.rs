@@ -1,5 +1,6 @@
 pub mod player;
 mod meteors;
+mod astronauts;
 pub mod events;
 mod systems;
 mod gameover; 
@@ -10,6 +11,7 @@ pub mod resources;
 use bevy::prelude::*;
 use mainmenu::MainMenuPlugin;
 use meteors::MeteorPlugin;
+use astronauts::AstronautPlugin;
 use player::PlayerPlugin;
 use gameover::GameOverPlugin;
 use events::GameOver;
@@ -37,6 +39,7 @@ fn main() {
     .add_event::<GameOver>()
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
+    .add_plugins(AstronautPlugin)
     .add_plugins((GameOverPlugin, MainMenuPlugin))
     .add_systems(Startup, spawn_camera)
     .add_systems(Update, (toggle_states, handle_game_over))
