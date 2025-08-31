@@ -1,13 +1,17 @@
 use bevy::prelude::*;
+
 use rand::prelude::*;
+
 use super::components::*;
 use super::resources::*;
 use crate::player::components::Player;
 use crate::resources::Score;
+use crate::resources::GameTime;
 
 const ASTRONAUT_SIZE: f32 = 64.0;
 const COLLECTION_DISTANCE: f32 = 32.0; //polovicna razdalja astronavta (da se priblizno zaletimo vanj)
-
+const ASTRONAUT_SPEED: f32 = 300.0; 
+ 
 pub fn tick_astronaut_spawn_timer(
     mut astronaut_spawn_timer: ResMut<AstronautSpawnTimer>,
     time: Res<Time>,
@@ -24,9 +28,9 @@ pub fn spawn_astronauts_over_time(
     if astronaut_spawn_timer.timer.finished() {
         let window = window_query.get_single().unwrap();
         
-        
-        let random_x = random::<f32>() * (window.width() - ASTRONAUT_SIZE) + ASTRONAUT_SIZE / 2.0;
-        let random_y = random::<f32>() * (window.height() - ASTRONAUT_SIZE) + ASTRONAUT_SIZE / 2.0;
+        let random_scale = random::<f32>() * 0.5 + 0.5;
+        let random_x = random::<f32>() * 512.0 - 256.;
+        let random_y = window.height() / 2.0 + 215. * random_scale / 2.0;
         
         commands.spawn((
             Sprite::from_image(asset_server.load("sprites/spaceAstronauts_001.png")),
@@ -52,6 +56,23 @@ pub fn check_astronaut_collection(
                 commands.entity(astronaut_entity).despawn();
             }
         }
+    }
+}
+
+pub fn astronaut_movement(
+    mut astronaut_query: Query<(&mut Transform, &Astronaut)>, 
+    time: Res<Time>,
+    game_time: Res<GameTime>
+) {
+    let astronaut_direction = Vec3::new(0.0, -1.0, 0.0);
+    
+    
+    // let time_intervals = game_time.get_time() / 30.0;  //ce zelimo da se spreminja hitrost s casom
+    // let speed_increase = time_intervals * 50.0;
+     let current_speed =  ASTRONAUT_SPEED; //+ speed_increase;
+    
+    for (mut astronaut_transform, _meteor) in astronaut_query.iter_mut() {
+        astronaut_transform.translation += astronaut_direction * current_speed * time.delta_secs();
     }
 }
 

@@ -16,6 +16,7 @@ impl Plugin for AstronautPlugin {
         app.add_systems(Update, (
             tick_astronaut_spawn_timer,
             spawn_astronauts_over_time,
+            astronaut_movement,
             check_astronaut_collection,
             astronaut_despawn
         ).run_if(in_state(AppState::Game)));
