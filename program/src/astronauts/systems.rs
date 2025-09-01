@@ -33,7 +33,8 @@ pub fn spawn_astronauts_over_time(
         
         commands.spawn((
             Sprite::from_image(asset_server.load("sprites/spaceAstronauts_001.png")),
-            Transform::from_xyz(random_x, random_y, 0.0),
+            Transform::from_xyz(random_x, random_y, 0.0)
+                .with_rotation(Quat::from_rotation_z((random::<f32>() * 360.).to_radians())),
             Astronaut::default(),
         ));
     }
