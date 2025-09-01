@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
-use crate::gameover::components::BlinkingText;
+use crate::ui::components::BlinkingText;
 use super::components::*;
+use crate::ui::score::resources::HighScore;
 
 
 pub fn display_mainmenu_text(
@@ -30,7 +31,7 @@ pub fn display_mainmenu_text(
             font_size: 32.0,
             ..default()
         },
-        TextColor::WHITE,
+        TextColor(Color::linear_rgba(0.28, 0.28, 0.28, 1.0)),
         Transform::from_xyz(0.0, -100., 0.0),
         Visibility::Visible,
         MainMenuText,
@@ -40,7 +41,7 @@ pub fn display_mainmenu_text(
 pub fn display_score_mainmenu_text(
   mut commands: Commands,
   asset_server: Res<AssetServer>,
-  high_score: Res<crate::resources::HighScore>,
+  high_score: Res<HighScore>,
 ) {
     let high_score_value = high_score.get();
     

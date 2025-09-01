@@ -5,6 +5,7 @@ use crate::events::GameOver;
 use crate::player::components::*;
 use crate::meteors::components::*;
 use crate::systems::sat_collision_detection;
+use crate::ui::score::resources::{Score, HighScore};
 
 pub const PLAYER_SPEED: f32 = 500.0;
 pub const BULLET_SPEED: f32 = 700.0;
@@ -92,8 +93,8 @@ pub fn check_collision_meteor_player(
     mut game_over_event_writer: EventWriter<GameOver>,
     mut meteor_query: Query<(&Transform, &Meteor), With<Meteor>>,
     mut player_query: Query<(Entity, &Transform), With<Player>>,
-    score: Res<crate::resources::Score>,
-    mut high_score: ResMut<crate::resources::HighScore>,
+    score: Res<Score>,
+    mut high_score: ResMut<HighScore>,
 ) {
 if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
         let levi_rob = player_transform.translation.x - PLAYER_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
@@ -222,7 +223,7 @@ pub fn bullet_meteor_collision_system(
     mut commands: Commands,
     bullet_query: Query<(Entity, &Transform), With<Bullet>>,
     meteor_query: Query<(Entity, &Transform, &Meteor), With<Meteor>>,
-    mut score: ResMut<crate::resources::Score>,
+    mut score: ResMut<Score>,
 ) {
 for (bullet_entity, bullet_transform) in bullet_query.iter() {
         let levi_rob = bullet_transform.translation.x - BULLET_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.

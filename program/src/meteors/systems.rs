@@ -3,7 +3,7 @@ use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
 use crate::meteors::components::*;
-use crate::resources::GameTime;
+use crate::ui::score::resources::GameTime;
 
 use super::resources::MeteorSpawnTimer;
 

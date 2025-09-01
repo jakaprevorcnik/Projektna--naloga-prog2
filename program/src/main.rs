@@ -3,19 +3,15 @@ mod meteors;
 mod astronauts;
 pub mod events;
 mod systems;
-mod gameover; 
-mod mainmenu;
-pub mod resources;
+mod ui;
 
 
 use bevy::prelude::*;
-use mainmenu::MainMenuPlugin;
 use meteors::MeteorPlugin;
 use astronauts::AstronautPlugin;
 use player::PlayerPlugin;
-use gameover::GameOverPlugin;
+use ui::UIPlugin;
 use events::GameOver;
-use resources::{GameTime, Score, HighScore};
 use crate::systems::*;
 
 
@@ -33,20 +29,13 @@ fn main() {
             ..Default::default()
         }))
     .init_state::<AppState>()
-    .init_resource::<GameTime>()
-    .init_resource::<Score>()
-    .init_resource::<HighScore>()
     .add_event::<GameOver>()
+    .add_plugins(UIPlugin)
     .add_plugins(PlayerPlugin)
     .add_plugins(MeteorPlugin)
     .add_plugins(AstronautPlugin)
-    .add_plugins((GameOverPlugin, MainMenuPlugin))
     .add_systems(Startup, (spawn_camera, spawn_background))
     .add_systems(Update, (toggle_states, handle_game_over))
-    //neurejeno
-    .add_systems(OnEnter(AppState::Game), (display_score_game_text, reset_game_time, reset_score))
-    .add_systems(Update, (update_game_time, update_score_with_time, update_score_display).run_if(in_state(AppState::Game)))
-    .add_systems(OnExit(AppState::Game), despawn_score_game_text)
     .run();
 }
 

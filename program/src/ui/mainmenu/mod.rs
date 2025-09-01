@@ -1,13 +1,13 @@
 use bevy::prelude::*;
 
 mod systems;
-mod components;
+pub mod components;
 
 use systems::*;
 use crate::AppState;
 
-use crate::gameover::resources::{VisibleTextTimer, HiddenTextTimer};
-use crate::gameover::systems::{tick_vh_text_timers, gameover_text_toggle_visibility};
+use super::resources::{VisibleTextTimer, HiddenTextTimer};
+use super::systems::{tick_vh_text_timers, ui_text_toggle_visibility};
 
 pub struct MainMenuPlugin;
 impl Plugin for MainMenuPlugin {
@@ -16,7 +16,7 @@ impl Plugin for MainMenuPlugin {
         app.init_resource::<HiddenTextTimer>();
         app.add_systems(OnEnter(AppState::MainMenu), 
         (display_mainmenu_text, display_score_mainmenu_text, spawn_main_menu_screen));
-        app.add_systems(Update, (tick_vh_text_timers, gameover_text_toggle_visibility)
+        app.add_systems(Update, (tick_vh_text_timers, ui_text_toggle_visibility)
             .run_if(in_state(AppState::MainMenu))); //to je vse zdaj skupaj nametano. Verjetno bi morala narediti skupen UI modul in plugin.
         app.add_systems(OnExit(AppState::MainMenu), (despawn_mainmenu_text, despawn_main_menu_screen_image));
     }

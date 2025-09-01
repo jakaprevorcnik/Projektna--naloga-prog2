@@ -5,8 +5,7 @@ use rand::prelude::*;
 use super::components::*;
 use super::resources::*;
 use crate::player::components::Player;
-use crate::resources::Score;
-use crate::resources::GameTime;
+use crate::ui::score::resources::{GameTime, Score};
 
 const ASTRONAUT_SIZE: f32 = 64.0;
 const COLLECTION_DISTANCE: f32 = 32.0; //polovicna razdalja astronavta (da se priblizno zaletimo vanj)
