@@ -10,6 +10,21 @@ pub fn spawn_camera(mut commands: Commands) {
   }
 
 
+pub fn spawn_background(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>
+) {
+    commands.spawn(
+        (
+            Sprite{
+                image: asset_server.load("sprites/Space Rangers - Background.png"),
+                ..Default::default()
+            },
+            Transform::from_xyz(0.0, 0.0, -20.)
+        )
+    );
+}
+
 
 // Kje in kako naj bo tale funkcija, še ne vem.
 pub fn toggle_states(

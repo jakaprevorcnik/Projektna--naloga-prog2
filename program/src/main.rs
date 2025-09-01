@@ -41,7 +41,7 @@ fn main() {
     .add_plugins(MeteorPlugin)
     .add_plugins(AstronautPlugin)
     .add_plugins((GameOverPlugin, MainMenuPlugin))
-    .add_systems(Startup, spawn_camera)
+    .add_systems(Startup, (spawn_camera, spawn_background))
     .add_systems(Update, (toggle_states, handle_game_over))
     //neurejeno
     .add_systems(OnEnter(AppState::Game), (display_score_game_text, reset_game_time, reset_score))

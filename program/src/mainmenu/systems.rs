@@ -16,21 +16,22 @@ pub fn display_mainmenu_text(
             ..default()
         },
         TextColor::WHITE,
-        Transform::from_xyz(0.0, -200., 0.0),
+        Transform::from_xyz(0.0, -256., 0.0),
         Visibility::Visible,
         MainMenuText,
         BlinkingText,
     ));
 
     commands.spawn((
-        Text2d::new("Work in progress"),
+        Text2d::new("Welcome, ranger! You have a mission in space!\nSave astronauts but beware of meteors and enemy ships.\nShoot bullets with the space key and earn additional points\nfor eliminating your foes."),
+        TextLayout::new(JustifyText::Center, LineBreak::WordBoundary),
         TextFont {
             font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
-            font_size: 40.0,
+            font_size: 32.0,
             ..default()
         },
         TextColor::WHITE,
-        Transform::from_xyz(0.0, 0., 0.0),
+        Transform::from_xyz(0.0, -100., 0.0),
         Visibility::Visible,
         MainMenuText,
     ));
@@ -53,7 +54,7 @@ pub fn display_score_mainmenu_text(
                 ..default()
             },
             TextColor::WHITE,
-            Transform::from_xyz(0.0, -256., 0.0),
+            Transform::from_xyz(0.0, -312., 0.0),
             MainMenuText,
         ));  
     }
