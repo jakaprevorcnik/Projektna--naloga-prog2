@@ -9,13 +9,22 @@ use crate::enemyships::resources::EnemyShipSpawnTimer;
 
 const ENEMYSHIP_VERTICAL_SPEED: f32 = 50.0;
 const ENEMYSHIP_HORIZONTAL_SPEED: f32 = 120.0;
-// pub const ENEMYSHIP_RADIUS: f32 = ;
 
-// const OGLISCA
-// const CENTER
+const ENEMYSHIP_RADIUS: f32 = 67.0;
+const OGLISCA_ENEMYSHIP_SLIKA: [Vec2; 16] = [Vec2::new(17., 4.), Vec2::new(21.5, 0.), Vec2::new(104.5, 0.),
+    Vec2::new(109., 4.), Vec2::new(118., 28.), Vec2::new(126., 60.), Vec2::new(126., 73.),
+    Vec2::new(123., 82.), Vec2::new(105., 106.), Vec2::new(96., 108.), Vec2::new(29., 108.),
+    Vec2::new(21., 106.), Vec2::new(3., 82.), Vec2::new(0., 73.), Vec2::new(0., 60.), Vec2::new(8., 28.)];
+const CENTER_ENEMYSHIP_SLIKA: Vec2 = Vec2::new(63., 54.);
 
 const ENEMYBULLET_SHOOT_TIME: f32 = 1.8;
 const ENEMYBULLET_SPEED: f32 = 200.0;
+
+const ENEMYBULLET_RADIUS: f32 = 18.0;
+const OGLISCA_ENEMYBULLET_SLIKA: [Vec2; 12] = [Vec2::new(0., 7.), Vec2::new(1., 4.), Vec2::new(4., 0.),
+    Vec2::new(6., 0.), Vec2::new(9., 4.), Vec2::new(10., 7.), Vec2::new(10., 24.), Vec2::new(9., 34.),
+    Vec2::new(7., 35.), Vec2::new(3., 35.), Vec2::new(1., 34.), Vec2::new(0., 24.)];
+const CENTER_ENEMYBULLET_SLIKA: Vec2 = Vec2::new(5.5, 17.5);
 
 
 
@@ -43,7 +52,8 @@ pub fn spawn_enemyships_over_time(
                 x_smer = -1.0;
             }
 
-            // let oglisca = ;
+            let oglisca = create_vertex_vector(
+                OGLISCA_ENEMYSHIP_SLIKA.to_vec(), CENTER_ENEMYSHIP_SLIKA, (180_f32).to_radians(), 0.5);
         
             commands.spawn(
                 (
@@ -56,14 +66,34 @@ pub fn spawn_enemyships_over_time(
                     EnemyShip {
                         x_smer : x_smer,
                         bullet_shoot_timer : Timer::from_seconds(ENEMYBULLET_SHOOT_TIME, TimerMode::Repeating),
-                        // oglisca_izhodisce : oglisca,
+                        oglisca_izhodisce : oglisca,
+                        radij : ENEMYSHIP_RADIUS
                     },
                 )
             );            
         }
     }
 
+// fn create_enemyship_vertex_array() -> [Vec2; 16] {
+//     let mut oglisca_array: [Vec2; 16] = [Vec2::new(0., 0.); 16];
+//     for (i, vec) in OGLISCA_ENEMYSHIP_SLIKA.iter().enumerate() {
+//         oglisca_array[i] = Vec2::from_angle((180_f32).to_radians()).rotate((vec - CENTER_ENEMYSHIP_SLIKA) * 0.5)
+//     };
+//     oglisca_array
+// }
 
+fn create_vertex_vector(
+    mut vertex_vector: Vec<Vec2>,
+    center: Vec2,
+    kot_radiani: f32,
+    skala: f32
+) -> Vec<Vec2> {
+    for vec in vertex_vector.iter_mut() {
+        *vec = Vec2::from_angle(kot_radiani).rotate((*vec - center) * skala)
+    };
+    vertex_vector
+}
+// Če bi mela vectorje, pol tud to funkcijo nared sam eno: z vektorjem, kotom, scaleom. in pol vse tri notr pomečeš v to funkcijo.
 
 
 pub fn enemyship_movement(
@@ -153,6 +183,10 @@ pub fn shoot_enemy_bullet(
 ){
     for (enemyship, enemyship_transform) in enemyship_query.iter() {
         if enemyship.bullet_shoot_timer.finished() {
+
+            let oglisca= create_vertex_vector(
+                OGLISCA_ENEMYBULLET_SLIKA.to_vec(), CENTER_ENEMYBULLET_SLIKA, (180_f32).to_radians(), 1.0);
+
             commands.spawn((
                 Sprite {
                     image: asset_server.load("sprites/spaceMissiles_037.png"),
@@ -163,11 +197,16 @@ pub fn shoot_enemy_bullet(
                     enemyship_transform.translation.y - 40.0,
                     0.0,
                     ).with_rotation(Quat::from_rotation_z((180_f32).to_radians())),
-                EnemyBullet {},
+                EnemyBullet {
+                    oglisca_izhodisce: oglisca,
+                    radij: ENEMYBULLET_RADIUS
+                },
             ));
         }
     }
 }
+
+
 
 pub fn enemybullet_movement(
     mut enemybullet_query: Query<&mut Transform, With<EnemyBullet>>, 
