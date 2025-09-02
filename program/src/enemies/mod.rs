@@ -21,7 +21,7 @@ impl Plugin for EnemyPlugin {
         app.init_resource::<EnemyShipSpawnTimers>();
         app.add_plugins(MeteorPlugin);
         app.add_plugins(EnemyShipPlugin);
-        app.add_systems(Update, check_collision_player_enemy
-            .run_if(in_state(AppState::Game)));
+        // app.add_systems(Update, check_collision_player_enemy
+        //     .run_if(in_state(AppState::Game)));
     }
 }

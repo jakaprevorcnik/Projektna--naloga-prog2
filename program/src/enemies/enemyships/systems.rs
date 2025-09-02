@@ -58,11 +58,11 @@ pub fn spawn_enemyships_over_time(
         enemyship_spawn_timers.reset_spawn_score();
     } else if enemyship_spawn_timers.update_timer.finished() {
         enemyship_spawn_timers.update_spawn_score(random::<f32>() * game_time.get_time());
-        // println!("{}", enemyship_spawn_timers.spawn_score);
+        println!("{}, {}", enemyship_spawn_timers.spawn_score, 40. * game_time.get_time());
 
-        if enemyship_spawn_timers.spawn_score > ENEMYSHIP_MIN_SPAWN_SCORE && enemyship_spawn_timers.min_timer.finished() {
+        if enemyship_spawn_timers.spawn_score > 40. * game_time.get_time() && enemyship_spawn_timers.min_timer.finished() {
             spawn_enemyship(commands, window_query, asset_server);
-            // println!("Spawnano po score-u.");
+            println!("Spawnano po score-u.");
             enemyship_spawn_timers.min_timer.reset();
             enemyship_spawn_timers.min_timer.unpause();
             enemyship_spawn_timers.max_timer.reset();
