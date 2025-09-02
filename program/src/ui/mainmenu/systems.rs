@@ -45,7 +45,7 @@ pub fn display_score_mainmenu_text(
 ) {
     let high_score_value = high_score.get();
     
-    // Only show high score if it's greater than 0 (something has been played)
+    // Only show high score if it's greater than 0 (the game has been played)
     if high_score_value > 0 {
         commands.spawn((
             Text2d::new(format!("High score: {}", high_score_value)),
@@ -91,7 +91,7 @@ pub fn spawn_main_menu_screen(
 
 pub fn despawn_main_menu_screen_image(
     mut commands: Commands,
-    mut image_query: Query<Entity, With<MenuImage>>     
+    image_query: Query<Entity, With<MenuImage>>     
 ) {
     for image in image_query.iter() {
         commands.entity(image).despawn();

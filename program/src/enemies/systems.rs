@@ -5,8 +5,6 @@ use crate::ui::score::resources::{Score, HighScore};
 use crate::systems::sat_collision_detection;
 
 use crate::player::{components::*, systems::{CENTER_LADJE_SLIKA, OGLISCA_LADJE_SLIKA}};
-// use crate::enemies::meteors::components::Meteor;
-// use crate::enemies::enemyships::{components::EnemyShip, enemybullets::components::EnemyBullet};
 use crate::enemies::components::Enemy;
 
 pub fn create_vertex_vector(
@@ -30,8 +28,8 @@ pub fn check_collision_player_enemy(
     score: Res<Score>,
     mut high_score: ResMut<HighScore>,
 ) {
-if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
-        let levi_rob = player_transform.translation.x - PLAYER_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
+    if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
+        let levi_rob = player_transform.translation.x - PLAYER_WIDTH / 4.0;
         let desni_rob = player_transform.translation.x + PLAYER_WIDTH / 4.0;
         let zgornji_rob = player_transform.translation.y + PLAYER_HEIGHT / 4.0;
         let spodnji_rob = player_transform.translation.y - PLAYER_WIDTH / 4.0;
@@ -53,29 +51,21 @@ if let Ok((player_entity, player_transform)) = player_query.get_single_mut() {
                     oglisca_enemyja.push(vec + pozicija_enemyja)
                 }
 
-                // if sat_collision_detection(&(oglisca_ladje.to_vec()), &(oglisca_meteorja.to_vec())) {
                 if sat_collision_detection(&oglisca_ladje, &oglisca_enemyja) {
-                    println!("Zadet si bil.");
                     commands.entity(player_entity).despawn();
                     
                     let final_score = score.get_score();
-                    let is_new_high_score = high_score.update(final_score);
-                    
-                    if is_new_high_score {
-                        println!("NEW HIGH SCORE! {}", final_score);
-                    }
+                    high_score.update(final_score);
                     
                     game_over_event_writer.send(GameOver { score: final_score });                    
                 }
 
             }
         }
+    }
 }
 
-}
 
-// Aproksimacija je: enemyji-krogi in player-pravokotnik.
-// Glej https://www.jeffreythompson.org/collision-detection/circle-rect.php, ta algoritem je.
 pub fn circle_rectangle_collision_aprox(
     krog_x0: f32,
     krog_y0: f32,

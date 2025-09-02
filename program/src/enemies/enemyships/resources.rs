@@ -4,19 +4,19 @@ pub const ENEMYSHIP_MIN_SPAWN_TIME: f32 = 5.0;
 pub const ENEMYSHIP_MAX_SPAWN_TIME: f32 = 15.0;
 
 #[derive(Resource)]
-pub struct EnemyShipSpawnTimers {
+pub struct EnemyShipSpawnTimer {
     pub timer: Timer,
 }
 
-impl Default for EnemyShipSpawnTimers {
+impl Default for EnemyShipSpawnTimer {
     fn default() -> Self {
-        EnemyShipSpawnTimers { 
+        EnemyShipSpawnTimer { 
             timer: Timer::from_seconds(ENEMYSHIP_MAX_SPAWN_TIME, TimerMode::Once),
         }
     }
 }
 
-impl EnemyShipSpawnTimers {
+impl EnemyShipSpawnTimer {
     pub fn to_default(&mut self) {
         self.timer = Timer::from_seconds(ENEMYSHIP_MAX_SPAWN_TIME, TimerMode::Once);
     }
@@ -25,6 +25,3 @@ impl EnemyShipSpawnTimers {
         self.timer = Timer::from_seconds(time, TimerMode::Once);
     }
 }
-
-//Zaenkrat, da vidim, ali delajo druge stvari. Potem bi nekako z GameTime-om naredila, da se malo vedno pogosteje spawnajo-
-// Pa malo mora bit random, pa za začetek je prepogosto.

@@ -25,7 +25,7 @@ pub fn spawn_background(
 }
 
 
-// Kje in kako naj bo tale funkcija, še ne vem.
+
 pub fn toggle_states(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     app_state: Res<State<AppState>>,
@@ -35,35 +35,29 @@ pub fn toggle_states(
         AppState::MainMenu => {
             if keyboard_input.just_pressed(KeyCode::Space) {
                 simulation_state_next_state.set(AppState::Game);
-                println!("New game started.");
             }
         }
         AppState::GameOver => {
             if keyboard_input.just_pressed(KeyCode::Space) {
                 simulation_state_next_state.set(AppState::Game);
-                println!("New game started.");
             }
 
             if keyboard_input.just_pressed(KeyCode::Escape) {
                 simulation_state_next_state.set(AppState::MainMenu);
-                println!("Returned to main menu.");
             }
         }
-        AppState::Game => {} // Ali naj bi obstajala možnost za return na main menu?
+        AppState::Game => {} // Ali naj bi obstajala možnost za return na main menu? Trenutno ne.
     }
 }
 
-// Kle nej bi ble sam menjave in ta komunikacija.
 
 pub fn handle_game_over(
     mut game_over_event_reader: EventReader<GameOver>,
     mut app_state_next_state: ResMut<NextState<AppState>>,
 ) {
     for event in game_over_event_reader.read() {
-        println!("Your final score is: {}", event.score.to_string());
         // Note: Score will be reset when starting a new game, not here
         app_state_next_state.set(AppState::GameOver);
-        println!("Entered AppState::GameOver");
     }
 }
 
@@ -71,9 +65,8 @@ pub fn handle_game_over(
 
 
 // SAT convex polygon collision detection
-pub fn sat_collision_detection(veckotnik1: &Vec<Vec2>, veckotnik2: &Vec<Vec2>) -> bool { // TIPI ?!?!?!
+pub fn sat_collision_detection(veckotnik1: &Vec<Vec2>, veckotnik2: &Vec<Vec2>) -> bool {
     
-    // zdele ne vem, kako z referencami delat
     let mut veckotnik1 = & *veckotnik1;
     let mut veckotnik2 = & *veckotnik2;
 
@@ -88,10 +81,10 @@ pub fn sat_collision_detection(veckotnik1: &Vec<Vec2>, veckotnik2: &Vec<Vec2>) -
 
     for (i, vec) in veckotnik1.iter().enumerate() {
         let j = (i + 1) % velikost1;
-        let os_projekcije = (veckotnik1[j] - vec).perp(); // a to res nardi normalo na to stranico?
+        let os_projekcije = (veckotnik1[j] - vec).perp();
 
         let min_r1 = &mut (f32::INFINITY);
-        let max_r1 = &mut (-(f32::INFINITY));  // Pozabila sem, kako uporabljati reference .... ?!?!
+        let max_r1 = &mut (-(f32::INFINITY));
         for vec1 in veckotnik1.iter() {
             let q = os_projekcije.dot(*vec1);
 

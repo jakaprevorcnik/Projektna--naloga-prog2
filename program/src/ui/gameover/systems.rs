@@ -49,7 +49,7 @@ pub fn display_gameover_text(
         BlinkingText,
     ));
 }
-// Na konzolo jaz ne bi nič pisala zares, ko bo ostalo urejeno.
+
 
 pub fn display_score_gameover_text(
   mut commands: Commands,
@@ -99,7 +99,6 @@ pub fn display_score_gameover_text(
         ));
     }
 }
-// Poseben pogoj za NewHighScore, da potem namesto High score: ... izpiše "NEW HIGH SCORE!" mal na večje
 
 pub fn despawn_gameover_text (
   mut commands: Commands,

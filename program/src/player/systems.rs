@@ -36,11 +36,12 @@ pub fn spawn_player(
                 image: asset_server.load("sprites/spaceShips_008.png"),
                 ..Default::default()
             },
-            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0).with_scale(Vec3::splat(0.5)), // ce das pr y 1.5 namest 2.5 je cis na dnu, sam se ga vid samo k mas cez cel zaslon sliko.
+            Transform::from_xyz(0.0, - (window.height() / 2.5), 0.0).with_scale(Vec3::splat(0.5)),
             Player {},
         )
     );
-} // Za popravit je mogoče, ker če imaš fullscreen (kar sicer ni mišljeno), je do respawn-a vse čudn.
+} // Ni mišljeno, da bi igro igral v celozaslonskem načinu - še manj, da bi med igro preklapljal.
+
 
 pub fn player_movement(keyboard_input: 
     Res<ButtonInput<KeyCode>>,
@@ -70,7 +71,6 @@ pub fn confine_player_movement(
 
         let mut translation = player_transform.translation;
 
-        // Bound the player x position
         if translation.x < x_min {
             translation.x = x_min;
         } else if translation.x > x_max {

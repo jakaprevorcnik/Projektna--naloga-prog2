@@ -12,13 +12,13 @@ use crate::AppState;
 use meteors::*;
 use enemyships::*;
 use meteors::resources::MeteorSpawnTimer;
-use enemyships::resources::EnemyShipSpawnTimers;
+use enemyships::resources::EnemyShipSpawnTimer;
 
 pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<MeteorSpawnTimer>();
-        app.init_resource::<EnemyShipSpawnTimers>();
+        app.init_resource::<EnemyShipSpawnTimer>();
         app.add_plugins(MeteorPlugin);
         app.add_plugins(EnemyShipPlugin);
         app.add_systems(Update, check_collision_player_enemy

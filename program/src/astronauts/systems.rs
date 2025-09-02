@@ -6,10 +6,10 @@ use super::components::*;
 use super::resources::*;
 use crate::player::components::Player;
 use crate::events::{GameOver, AstronautMissed};
-use crate::ui::score::resources::{Score, HighScore}; //GameTime
+use crate::ui::score::resources::{Score, HighScore};
 
-const ASTRONAUT_SIZE: f32 = 64.0;
-const COLLECTION_DISTANCE: f32 = 32.0; //polovicna razdalja astronavta (da se priblizno zaletimo vanj)
+// const ASTRONAUT_SIZE: f32 = 64.0;
+const COLLECTION_DISTANCE: f32 = 32.0; //Polovicna razdalja astronavta (da se priblizno zaletimo vanj)
 const ASTRONAUT_SPEED: f32 = 300.0; 
  
 
@@ -64,17 +64,11 @@ pub fn check_astronaut_collection(
 pub fn astronaut_movement(
     mut astronaut_query: Query<(&mut Transform, &Astronaut)>, 
     time: Res<Time>,
-    // game_time: Res<GameTime>
 ) {
     let astronaut_direction = Vec3::new(0.0, -1.0, 0.0);
-    
-    
-    // let time_intervals = game_time.get_time() / 30.0;  //ce zelimo da se spreminja hitrost s casom
-    // let speed_increase = time_intervals * 50.0;
-     let current_speed =  ASTRONAUT_SPEED; //+ speed_increase;
-    
+   
     for (mut astronaut_transform, _meteor) in astronaut_query.iter_mut() {
-        astronaut_transform.translation += astronaut_direction * current_speed * time.delta_secs();
+        astronaut_transform.translation += astronaut_direction * ASTRONAUT_SPEED * time.delta_secs();
     }
 }
 
@@ -83,11 +77,11 @@ pub fn check_handle_astronaut_missed(
     astronaut_query: Query<(Entity, &Transform), With<Astronaut>>,
     window_query: Query<&Window>,
     mut astronauts_missed_counter: ResMut<AstronautsMissedCounter>,
+    mut astronaut_missed_event_writer: EventWriter<AstronautMissed>,
     mut game_over_event_writer: EventWriter<GameOver>,
-    mut player_query: Query<Entity, With<Player>>,
+    player_query: Query<Entity, With<Player>>,
     score: Res<Score>,
     mut high_score: ResMut<HighScore>,
-    mut astronaut_missed_event_writer: EventWriter<AstronautMissed>,
 ) {
     let window = window_query.get_single().unwrap();
     
@@ -100,17 +94,20 @@ pub fn check_handle_astronaut_missed(
             || translation.x > window.width() * 2.0
         {
             commands.entity(astronaut_entity).despawn();
-            astronauts_missed_counter.missed(); //suboptimalno, da ta še rihta vse ...
+            astronauts_missed_counter.missed();
             astronaut_missed_event_writer.send(AstronautMissed {counter : astronauts_missed_counter.counter} );
+
             if astronauts_missed_counter.counter >= 3 {
+
                 if let Ok(player_entity) = player_query.get_single() {
                 commands.entity(player_entity).despawn();
 
                 let final_score = score.get_score();
-                let is_new_high_score = high_score.update(final_score); //suboptimalno, da je kle še flag
+                high_score.update(final_score);
     
                 game_over_event_writer.send(GameOver { score: final_score });                    
-            }}
+                }
+            }
         }
     }
 }

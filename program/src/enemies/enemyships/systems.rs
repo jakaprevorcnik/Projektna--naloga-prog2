@@ -9,7 +9,7 @@ use crate::enemies::components::Enemy;
 use crate::enemies::enemyships::{components::*, resources::{ENEMYSHIP_MAX_SPAWN_TIME, ENEMYSHIP_MIN_SPAWN_TIME}};
 use crate::ui::score::resources::GameTime;
 
-use crate::enemies::enemyships::resources::EnemyShipSpawnTimers;
+use crate::enemies::enemyships::resources::EnemyShipSpawnTimer;
 
 const ENEMYSHIP_VERTICAL_SPEED: f32 = 50.0;
 const ENEMYSHIP_HORIZONTAL_SPEED: f32 = 120.0;
@@ -27,26 +27,26 @@ const ENEMYBULLET_SHOOT_TIME: f32 = 1.0;
 
 
 pub fn tick_enemyship_spawn_timer(
-    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>,
+    mut enemyship_spawn_timer: ResMut<EnemyShipSpawnTimer>,
     time: Res<Time>
 ) {
-    enemyship_spawn_timers.timer.tick(time.delta());
+    enemyship_spawn_timer.timer.tick(time.delta());
 }
 
 pub fn reset_enemyship_spawn_timers(
-    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>
+    mut enemyship_spawn_timer: ResMut<EnemyShipSpawnTimer>
 ) {
-    enemyship_spawn_timers.to_default(); 
+    enemyship_spawn_timer.to_default(); 
 }
 
 pub fn spawn_enemyships_over_time(
-    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>,
+    mut enemyship_spawn_timer: ResMut<EnemyShipSpawnTimer>,
     commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
     game_time: Res<GameTime>
 ) {
-    if enemyship_spawn_timers.timer.finished() {
+    if enemyship_spawn_timer.timer.finished() {
         spawn_enemyship(commands, window_query, asset_server);
         
         let mut new_time = ENEMYSHIP_MAX_SPAWN_TIME - random::<f32>() * 0.1 * game_time.get_time();
@@ -54,10 +54,8 @@ pub fn spawn_enemyships_over_time(
             new_time = ENEMYSHIP_MIN_SPAWN_TIME;
         }
 
-        enemyship_spawn_timers.set_new_timer(new_time);
-        enemyship_spawn_timers.timer.unpause();
-
-        println!("{new_time}");
+        enemyship_spawn_timer.set_new_timer(new_time);
+        enemyship_spawn_timer.timer.unpause();
     }
 }
 
@@ -69,7 +67,7 @@ fn spawn_enemyship(
         let window = window_query.get_single().unwrap();
 
         let random_x = random::<f32>() * 512.0 - 256.; 
-        let ship_y = window.height() / 2.0 + 60. / 2.0; // 60 je malo več kot polovica višine originalne slike ladje
+        let ship_y = window.height() / 2.0 + 60. / 2.0; // 60 je malo več kot polovica višine ladje.
         let coin_flip_direction = random::<bool>();
         let mut x_smer = 1.0;
         if coin_flip_direction {
@@ -89,8 +87,6 @@ fn spawn_enemyship(
                 EnemyShip {
                     x_smer : x_smer,
                     bullet_shoot_timer : Timer::from_seconds(ENEMYBULLET_SHOOT_TIME, TimerMode::Repeating),
-                    // oglisca_izhodisce : oglisca,
-                    // radij : ENEMYSHIP_RADIUS
                 },
                 Enemy {
                     oglisca_izhodisce : oglisca,
@@ -165,7 +161,7 @@ pub fn enemyship_despawn(
 
 pub fn despawn_all_enemyships(
     mut commands: Commands,
-    mut ship_query: Query<Entity, With<EnemyShip>>     
+    ship_query: Query<Entity, With<EnemyShip>>     
 ) {
     for ship_entity in ship_query.iter() {
         commands.entity(ship_entity).despawn();

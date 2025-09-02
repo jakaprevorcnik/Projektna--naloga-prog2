@@ -46,10 +46,7 @@ pub fn shoot_enemy_bullet(
                     enemyship_transform.translation.y - 40.0,
                     0.0,
                     ).with_rotation(Quat::from_rotation_z((180_f32).to_radians())),
-                EnemyBullet {
-                    // oglisca_izhodisce: oglisca,
-                    // radij: ENEMYBULLET_RADIUS
-                },
+                EnemyBullet,
                 Enemy {
                     oglisca_izhodisce: oglisca,
                     radij: ENEMYBULLET_RADIUS
@@ -74,13 +71,13 @@ pub fn enemybullet_movement(
 pub fn enemybullets_despawn(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    mut enemybullet_query: Query<(Entity, &Transform), With<EnemyBullet>>
+    enemybullet_query: Query<(Entity, &Transform), With<EnemyBullet>>
 ) {
     let window = window_query.get_single().unwrap();
 
     let min_y = - window.height() / 2.0 - 20.0;
 
-    for (enemybullet_entity, enemybullet_transform) in enemybullet_query.iter_mut() {
+    for (enemybullet_entity, enemybullet_transform) in enemybullet_query.iter() {
         if enemybullet_transform.translation.y < min_y {
             commands.entity(enemybullet_entity).despawn();
         }

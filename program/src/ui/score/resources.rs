@@ -8,10 +8,7 @@ const HIGH_SCORE_FILE: &str = "highscore.txt";
 pub struct GameTime {
     pub gametime: f32,
     timer: Timer,
-} // Teče linearno, dokler si v Game state-u, vsakič od začetka mora bit. 
-// Je sestavni del score-a in merilec za naraščajočo težavnost.
-
-//GameTime bi mogoče loh in moral biti pri src/resources, ker je više od samo UI score-a.
+} 
 
 #[derive(Resource)]
 pub struct Score {
@@ -114,13 +111,10 @@ impl HighScore {
         self.high_score
     }
     
-    pub fn update(&mut self, new_score: u32) -> bool {
+    pub fn update(&mut self, new_score: u32) {//-> bool {
         if new_score > self.high_score {
             self.high_score = new_score;
             save_high_score(new_score);
-            true // New high score!
-        } else {
-            false
         }
     }
 }
@@ -130,7 +124,7 @@ fn load_high_score() -> u32 { // Naloži high score iz datoteke highscore.txt
     if Path::new(HIGH_SCORE_FILE).exists() {
         match fs::read_to_string(HIGH_SCORE_FILE) {
             Ok(content) => content.trim().parse().unwrap_or(0),
-            Err(_) => 0, // ce dobimo kakrsno koli napako nastavi high score na 0
+            Err(_) => 0, // Ce dobimo kakrsno koli napako, nastavi high score na 0
         }
     } else {
         0
@@ -141,4 +135,4 @@ fn save_high_score(score: u32) { // Shrani nov high score v datoteko highscore.t
     if let Err(e) = fs::write(HIGH_SCORE_FILE, score.to_string()) {
         eprintln!("Failed to save high score: {}", e);
     }
-} //ce hocemo resetirat highscore ga samo nastavimo na 0 v highscore.txt
+} //Ce hocemo resetirat highscore, ga samo nastavimo na 0 v highscore.txt

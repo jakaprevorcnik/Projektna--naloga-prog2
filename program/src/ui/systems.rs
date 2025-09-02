@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::ui::components::*;
 use crate::ui::resources::{VisibleTextTimer, HiddenTextTimer};
 use crate::ui::components::GameText;
-use crate::events::{AstronautMissed, GameOver};
+use crate::events::AstronautMissed;
 
 
 pub fn tick_vh_text_timers(
@@ -21,8 +21,7 @@ pub fn ui_text_toggle_visibility (
     mut visible_text_timer: ResMut<VisibleTextTimer>,
     mut hidden_text_timer: ResMut<HiddenTextTimer>,
 ) {
-    // Ali moram narediti poseben system, ki unpause-a oba timerja ob vstopu v state?
-    // spawn-a se kot visible
+    // Spawn-a se kot visible.
     for mut visibility in text_query.iter_mut() {
         match *visibility {
             Visibility::Visible => {
@@ -60,7 +59,7 @@ pub fn display_astronauts_game_text(
         },
         TextColor::WHITE,
         TextLayout::new_with_justify(JustifyText::Right),
-        Transform::from_xyz(-400., -256., -1.), //Ne vem, kako narediti transform glede na desen rob.
+        Transform::from_xyz(-400., -256., -1.),
         GameText
     ));  
 
