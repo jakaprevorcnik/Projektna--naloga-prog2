@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 mod systems;
 pub mod components;
-mod resources;
+pub mod resources;
 
 use resources::MeteorSpawnTimer;
 use systems::*;

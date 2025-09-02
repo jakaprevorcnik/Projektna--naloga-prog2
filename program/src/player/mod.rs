@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-mod systems;
+pub mod systems;
 pub mod components;
 
 use systems::*;
@@ -18,7 +18,7 @@ impl Plugin for PlayerPlugin {
             confine_player_movement
         ));
         app.add_systems(Update, (
-            check_collision_meteor_player,
+            // check_collision_meteor_player,
             shoot_bullet,
             bullet_movement,
             bullet_meteor_collision_system,

@@ -1,17 +1,15 @@
 pub mod player;
-mod meteors;
 mod astronauts;
 pub mod events;
 mod systems;
 mod ui;
-mod enemyships;
+mod enemies;
 
 
 use bevy::prelude::*;
-use meteors::MeteorPlugin;
 use astronauts::AstronautPlugin;
 use player::PlayerPlugin;
-use enemyships::EnemyShipPlugin;
+use enemies::EnemyPlugin;
 use ui::UIPlugin;
 use events::GameOver;
 use crate::systems::*;
@@ -34,9 +32,8 @@ fn main() {
     .add_event::<GameOver>()
     .add_plugins(UIPlugin)
     .add_plugins(PlayerPlugin)
-    .add_plugins(MeteorPlugin)
     .add_plugins(AstronautPlugin)
-    .add_plugins(EnemyShipPlugin)
+    .add_plugins(EnemyPlugin)
     .add_systems(Startup, (spawn_camera, spawn_background))
     .add_systems(Update, (toggle_states, handle_game_over))
     .run();

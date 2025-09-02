@@ -2,7 +2,8 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
 
-use crate::meteors::components::*;
+use crate::enemies::meteors::components::*;
+use crate::enemies::components::Enemy;
 use crate::ui::score::resources::GameTime;
 
 use super::resources::MeteorSpawnTimer;
@@ -63,6 +64,10 @@ pub fn spawn_meteors_over_time(
                     Meteor {
                         radij : METEOR_RADIUS * random_scale,
                         oglisca_izhodisce : oglisca,
+                    }, // VSE ZA POPRAVIT. ČE BO TOLE DELALO
+                    Enemy {
+                        radij : METEOR_RADIUS * random_scale,
+                        oglisca_izhodisce : oglisca.to_vec(),
                     },
                 )
             );            
