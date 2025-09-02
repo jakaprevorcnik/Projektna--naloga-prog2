@@ -5,7 +5,7 @@ use rand::prelude::*;
 use crate::enemies::systems::{create_vertex_vector};
 use crate::enemies::components::Enemy;
 
-use crate::enemies::enemyships::components::*;
+use crate::enemies::enemyships::{components::*, resources::{ENEMYSHIP_MAX_SPAWN_TIME, ENEMYSHIP_MIN_SPAWN_TIME}};
 use crate::ui::score::resources::GameTime;
 
 use crate::enemies::enemyships::resources::EnemyShipSpawnTimers;
@@ -22,26 +22,19 @@ const CENTER_ENEMYSHIP_SLIKA: Vec2 = Vec2::new(63., 54.);
 
 const ENEMYBULLET_SHOOT_TIME: f32 = 1.8;
 
-const ENEMYSHIP_MIN_SPAWN_SCORE: f32 = 5000.0;
-
 
 
 pub fn tick_enemyship_spawn_timer(
     mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>,
     time: Res<Time>
 ) {
-    enemyship_spawn_timers.min_timer.tick(time.delta());
-    enemyship_spawn_timers.max_timer.tick(time.delta());
-    enemyship_spawn_timers.update_timer.tick(time.delta());
-
+    enemyship_spawn_timers.timer.tick(time.delta());
 }
 
 pub fn reset_enemyship_spawn_timers(
     mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>
 ) {
-    enemyship_spawn_timers.min_timer.reset();
-    enemyship_spawn_timers.max_timer.reset();
-    enemyship_spawn_timers.reset_spawn_score();    
+    enemyship_spawn_timers.to_default(); 
 }
 
 pub fn spawn_enemyships_over_time(
@@ -51,23 +44,18 @@ pub fn spawn_enemyships_over_time(
     asset_server: Res<AssetServer>,
     game_time: Res<GameTime>
 ) {
-    if enemyship_spawn_timers.max_timer.finished() {
+    if enemyship_spawn_timers.timer.finished() {
         spawn_enemyship(commands, window_query, asset_server);
-        enemyship_spawn_timers.min_timer.reset();
-        enemyship_spawn_timers.min_timer.unpause();
-        enemyship_spawn_timers.reset_spawn_score();
-    } else if enemyship_spawn_timers.update_timer.finished() {
-        enemyship_spawn_timers.update_spawn_score(random::<f32>() * game_time.get_time());
-        println!("{}, {}", enemyship_spawn_timers.spawn_score, 40. * game_time.get_time());
-
-        if enemyship_spawn_timers.spawn_score > 40. * game_time.get_time() && enemyship_spawn_timers.min_timer.finished() {
-            spawn_enemyship(commands, window_query, asset_server);
-            println!("Spawnano po score-u.");
-            enemyship_spawn_timers.min_timer.reset();
-            enemyship_spawn_timers.min_timer.unpause();
-            enemyship_spawn_timers.max_timer.reset();
-            enemyship_spawn_timers.reset_spawn_score();
+        
+        let mut new_time = ENEMYSHIP_MAX_SPAWN_TIME - random::<f32>() * 0.1 * game_time.get_time();
+        if new_time < ENEMYSHIP_MIN_SPAWN_TIME {
+            new_time = ENEMYSHIP_MIN_SPAWN_TIME;
         }
+
+        enemyship_spawn_timers.set_new_timer(new_time);
+        enemyship_spawn_timers.timer.unpause();
+
+        println!("{new_time}");
     }
 }
 
@@ -110,30 +98,15 @@ fn spawn_enemyship(
         );            
 }
 
-// fn create_enemyship_vertex_array() -> [Vec2; 16] {
-//     let mut oglisca_array: [Vec2; 16] = [Vec2::new(0., 0.); 16];
-//     for (i, vec) in OGLISCA_ENEMYSHIP_SLIKA.iter().enumerate() {
-//         oglisca_array[i] = Vec2::from_angle((180_f32).to_radians()).rotate((vec - CENTER_ENEMYSHIP_SLIKA) * 0.5)
-//     };
-//     oglisca_array
-// }
 
-
-// Če bi mela vectorje, pol tud to funkcijo nared sam eno: z vektorjem, kotom, scaleom. in pol vse tri notr pomečeš v to funkcijo.
 
 
 pub fn enemyship_movement(
     mut enemyship_query: Query<(&mut Transform, &EnemyShip)>, 
     time: Res<Time>,
-    // game_time: Res<GameTime>
 ) {
     let enemyship_vertical = Vec3::new(0., -1., 0.);
     let enemyship_horizontal = Vec3::new(1.0, 0.0, 0.0);
-    
-    
-    // let time_intervals = game_time.get_time() / 30.0; 
-    // let speed_increase = time_intervals * 50.0;
-    // let current_speed = ENEMYSHIP_VERTICAL_SPEED + speed_increase;
     
     for (mut enemyship_transform, enemyship) in enemyship_query.iter_mut() {
         enemyship_transform.translation += enemyship_vertical * ENEMYSHIP_VERTICAL_SPEED * time.delta_secs(); // vertical
