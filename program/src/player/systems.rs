@@ -3,11 +3,12 @@ use bevy::window::PrimaryWindow;
 
 // use crate::events::GameOver;
 use crate::player::components::*;
-use crate::enemies::meteors::components::*;
+// use crate::enemies::meteors::components::*;
 use crate::systems::sat_collision_detection;
 // use crate::ui::score::resources::{Score, HighScore};
 use crate::ui::score::resources::Score;
-use crate::enemies::systems::circle_rectangle_collision_aprox;
+use crate::enemies::{components::Enemy, systems::circle_rectangle_collision_aprox};
+use crate::enemies::enemyships::enemybullets::components::EnemyBullet;
 
 pub const PLAYER_SPEED: f32 = 500.0;
 pub const BULLET_SPEED: f32 = 700.0;
@@ -120,10 +121,57 @@ pub fn bullet_movement (
     }
 }
 
-pub fn bullet_meteor_collision_system(
+// pub fn bullet_meteor_collision_system(
+//     mut commands: Commands,
+//     bullet_query: Query<(Entity, &Transform), With<Bullet>>,
+//     meteor_query: Query<(Entity, &Transform, &Meteor), With<Meteor>>,
+//     mut score: ResMut<Score>,
+// ) {
+// for (bullet_entity, bullet_transform) in bullet_query.iter() {
+//         let levi_rob = bullet_transform.translation.x - BULLET_WIDTH / 4.0; // je še scale-ano za pol, to bi tud morala dat v const vse.
+//         let desni_rob = bullet_transform.translation.x + BULLET_WIDTH / 4.0;
+//         let zgornji_rob = bullet_transform.translation.y + BULLET_HEIGHT / 4.0;
+//         let spodnji_rob = bullet_transform.translation.y - BULLET_WIDTH / 4.0;
+        
+//         for (meteor_entity, meteor_transform, meteor) in meteor_query.iter() {
+//             let met_x0 = meteor_transform.translation.x;
+//             let met_y0 = meteor_transform.translation.y;
+
+//             if circle_rectangle_collision_aprox(met_x0, met_y0, meteor.radij, levi_rob, desni_rob, zgornji_rob, spodnji_rob) {
+
+//                 let mut oglisca_metka = vec![]; //Nekonsistentna uporaba angleščine in slovenščine. ...
+//                 for vec in OGLISCA_METKA_SLIKA.iter() {
+//                     oglisca_metka.push(vec - CENTER_METKA_SLIKA + bullet_transform.translation.xy())
+//                 }
+
+//                 let mut oglisca_meteorja = vec![];
+//                 let pozicija_meteorja = Vec2::new(met_x0, met_y0);
+//                 for vec in meteor.oglisca_izhodisce.iter() {
+//                     oglisca_meteorja.push(vec + pozicija_meteorja)
+//                 }
+
+//                 // if sat_collision_detection(&(oglisca_ladje.to_vec()), &(oglisca_meteorja.to_vec())) {
+//                 if sat_collision_detection(&oglisca_metka, &oglisca_meteorja) {
+//                     commands.entity(bullet_entity).despawn();
+//                     commands.entity(meteor_entity).despawn();
+                    
+//                     // Add score for destroying meteor
+                    
+//                     score.add_points(10);
+                    
+//                     break;                
+//                 }
+
+//             }
+//         }
+// }
+
+// }
+
+pub fn bullet_bigenemy_collision_system(
     mut commands: Commands,
     bullet_query: Query<(Entity, &Transform), With<Bullet>>,
-    meteor_query: Query<(Entity, &Transform, &Meteor), With<Meteor>>,
+    bigenemy_query: Query<(Entity, &Transform, &Enemy), Without<EnemyBullet>>,
     mut score: ResMut<Score>,
 ) {
 for (bullet_entity, bullet_transform) in bullet_query.iter() {
@@ -132,31 +180,35 @@ for (bullet_entity, bullet_transform) in bullet_query.iter() {
         let zgornji_rob = bullet_transform.translation.y + BULLET_HEIGHT / 4.0;
         let spodnji_rob = bullet_transform.translation.y - BULLET_WIDTH / 4.0;
         
-        for (meteor_entity, meteor_transform, meteor) in meteor_query.iter() {
-            let met_x0 = meteor_transform.translation.x;
-            let met_y0 = meteor_transform.translation.y;
+        for (bigenemy_entity, bigenemy_transform, enemy) in bigenemy_query.iter() {
+            let enemy_x0 = bigenemy_transform.translation.x;
+            let enemy_y0 = bigenemy_transform.translation.y;
 
-            if circle_rectangle_collision_aprox(met_x0, met_y0, meteor.radij, levi_rob, desni_rob, zgornji_rob, spodnji_rob) {
+            if circle_rectangle_collision_aprox(enemy_x0, enemy_y0, enemy.radij, levi_rob, desni_rob, zgornji_rob, spodnji_rob) {
 
                 let mut oglisca_metka = vec![]; //Nekonsistentna uporaba angleščine in slovenščine. ...
                 for vec in OGLISCA_METKA_SLIKA.iter() {
                     oglisca_metka.push(vec - CENTER_METKA_SLIKA + bullet_transform.translation.xy())
                 }
 
-                let mut oglisca_meteorja = vec![];
-                let pozicija_meteorja = Vec2::new(met_x0, met_y0);
-                for vec in meteor.oglisca_izhodisce.iter() {
-                    oglisca_meteorja.push(vec + pozicija_meteorja)
+                let mut oglisca_enemyja = vec![];
+                let pozicija_enemyja = Vec2::new(enemy_x0, enemy_y0);
+                for vec in enemy.oglisca_izhodisce.iter() {
+                    oglisca_enemyja.push(vec + pozicija_enemyja)
                 }
 
                 // if sat_collision_detection(&(oglisca_ladje.to_vec()), &(oglisca_meteorja.to_vec())) {
-                if sat_collision_detection(&oglisca_metka, &oglisca_meteorja) {
+                if sat_collision_detection(&oglisca_metka, &oglisca_enemyja) {
                     commands.entity(bullet_entity).despawn();
-                    commands.entity(meteor_entity).despawn();
+                    commands.entity(bigenemy_entity).despawn();
                     
+                    if enemy.oglisca_izhodisce.len() == 10 {
                     // Add score for destroying meteor
-                    
                     score.add_points(10);
+                    } else if enemy.oglisca_izhodisce.len() == 16 {
+                    score.add_points(50); // To je enemyship
+                    }
+
                     
                     break;                
                 }
