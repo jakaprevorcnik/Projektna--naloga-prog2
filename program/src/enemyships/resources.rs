@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub const ENEMYSHIP_SPAWN_TIME: f32 = 8.0;
+pub const ENEMYSHIP_SPAWN_TIME: f32 = 14.0;
 
 #[derive(Resource)]
 pub struct EnemyShipSpawnTimer {

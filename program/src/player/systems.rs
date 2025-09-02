@@ -210,10 +210,10 @@ pub fn shoot_bullet(keyboard_input:
 }
 
 pub fn bullet_movement (
-    mut meteor_query: Query<(&mut Transform, &Bullet)>, 
+    mut bullet_query: Query<(&mut Transform, &Bullet)>, 
     time: Res<Time>
 ) {
-    for (mut bullet_transform, _bullet) in meteor_query.iter_mut() {
+    for (mut bullet_transform, _bullet) in bullet_query.iter_mut() {
         let bullet_direction = Vec3::new(0.0, 1.0, 0.0);
         bullet_transform.translation += bullet_direction * BULLET_SPEED * time.delta_secs();
     }
@@ -266,6 +266,24 @@ for (bullet_entity, bullet_transform) in bullet_query.iter() {
 }
 
 }
+
+
+pub fn bullets_despawn(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    mut bullet_query: Query<(Entity, &Transform), With<Bullet>>
+) {
+    let window = window_query.get_single().unwrap();
+
+    let max_y = window.height() / 2.0 + 20.0;
+
+    for (bullet_entity, bullet_transform) in bullet_query.iter_mut() {
+        if bullet_transform.translation.y > max_y {
+            commands.entity(bullet_entity).despawn();
+        }
+    }
+}
+
 
 pub fn despawn_all_bullets(
     mut commands: Commands,

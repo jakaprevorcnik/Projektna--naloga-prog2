@@ -21,7 +21,8 @@ impl Plugin for PlayerPlugin {
             check_collision_meteor_player,
             shoot_bullet,
             bullet_movement,
-            bullet_meteor_collision_system
+            bullet_meteor_collision_system,
+            bullets_despawn
         ).run_if(in_state(AppState::Game)));
         app.add_systems(OnEnter(AppState::GameOver), despawn_all_bullets);
     }
