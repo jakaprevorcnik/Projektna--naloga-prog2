@@ -11,6 +11,8 @@ pub struct GameTime {
 } // Teče linearno, dokler si v Game state-u, vsakič od začetka mora bit. 
 // Je sestavni del score-a in merilec za naraščajočo težavnost.
 
+//GameTime bi mogoče loh in moral biti pri src/resources, ker je više od samo UI score-a.
+
 #[derive(Resource)]
 pub struct Score {
     pub score: u32,

@@ -6,7 +6,6 @@ use crate::enemies::components::Enemy;
 use crate::enemies::enemyships::enemybullets::components::EnemyBullet;
 use crate::enemies::enemyships::components::EnemyShip;
 
-const ENEMYBULLET_SHOOT_TIME: f32 = 1.8;
 const ENEMYBULLET_SPEED: f32 = 200.0;
 
 const ENEMYBULLET_RADIUS: f32 = 18.0;

@@ -8,7 +8,7 @@ use crate::enemies::components::Enemy;
 use crate::enemies::enemyships::components::*;
 use crate::ui::score::resources::GameTime;
 
-use crate::enemies::enemyships::resources::EnemyShipSpawnTimer;
+use crate::enemies::enemyships::resources::EnemyShipSpawnTimers;
 
 const ENEMYSHIP_VERTICAL_SPEED: f32 = 50.0;
 const ENEMYSHIP_HORIZONTAL_SPEED: f32 = 120.0;
@@ -21,65 +21,94 @@ const OGLISCA_ENEMYSHIP_SLIKA: [Vec2; 16] = [Vec2::new(17., 4.), Vec2::new(21.5,
 const CENTER_ENEMYSHIP_SLIKA: Vec2 = Vec2::new(63., 54.);
 
 const ENEMYBULLET_SHOOT_TIME: f32 = 1.8;
-const ENEMYBULLET_SPEED: f32 = 200.0;
 
-const ENEMYBULLET_RADIUS: f32 = 18.0;
-const OGLISCA_ENEMYBULLET_SLIKA: [Vec2; 12] = [Vec2::new(0., 7.), Vec2::new(1., 4.), Vec2::new(4., 0.),
-    Vec2::new(6., 0.), Vec2::new(9., 4.), Vec2::new(10., 7.), Vec2::new(10., 24.), Vec2::new(9., 34.),
-    Vec2::new(7., 35.), Vec2::new(3., 35.), Vec2::new(1., 34.), Vec2::new(0., 24.)];
-const CENTER_ENEMYBULLET_SLIKA: Vec2 = Vec2::new(5.5, 17.5);
+const ENEMYSHIP_MIN_SPAWN_SCORE: f32 = 5000.0;
 
 
 
 pub fn tick_enemyship_spawn_timer(
-    mut enemyship_spawn_timer: ResMut<EnemyShipSpawnTimer>,
+    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>,
     time: Res<Time>
 ) {
-    enemyship_spawn_timer.timer.tick(time.delta());
+    enemyship_spawn_timers.min_timer.tick(time.delta());
+    enemyship_spawn_timers.max_timer.tick(time.delta());
+    enemyship_spawn_timers.update_timer.tick(time.delta());
+
+}
+
+pub fn reset_enemyship_spawn_timers(
+    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>
+) {
+    enemyship_spawn_timers.min_timer.reset();
+    enemyship_spawn_timers.max_timer.reset();
+    enemyship_spawn_timers.reset_spawn_score();    
 }
 
 pub fn spawn_enemyships_over_time(
+    mut enemyship_spawn_timers: ResMut<EnemyShipSpawnTimers>,
+    commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+    game_time: Res<GameTime>
+) {
+    if enemyship_spawn_timers.max_timer.finished() {
+        spawn_enemyship(commands, window_query, asset_server);
+        enemyship_spawn_timers.min_timer.reset();
+        enemyship_spawn_timers.min_timer.unpause();
+        enemyship_spawn_timers.reset_spawn_score();
+    } else if enemyship_spawn_timers.update_timer.finished() {
+        enemyship_spawn_timers.update_spawn_score(random::<f32>() * game_time.get_time());
+        // println!("{}", enemyship_spawn_timers.spawn_score);
+
+        if enemyship_spawn_timers.spawn_score > ENEMYSHIP_MIN_SPAWN_SCORE && enemyship_spawn_timers.min_timer.finished() {
+            spawn_enemyship(commands, window_query, asset_server);
+            // println!("Spawnano po score-u.");
+            enemyship_spawn_timers.min_timer.reset();
+            enemyship_spawn_timers.min_timer.unpause();
+            enemyship_spawn_timers.max_timer.reset();
+            enemyship_spawn_timers.reset_spawn_score();
+        }
+    }
+}
+
+fn spawn_enemyship(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
-    enemyship_spawn_timer: Res<EnemyShipSpawnTimer>
 ) {
-        if enemyship_spawn_timer.timer.finished() {
-            let window = window_query.get_single().unwrap();
+        let window = window_query.get_single().unwrap();
 
-            let random_x = random::<f32>() * 512.0 - 256.; 
-            let ship_y = window.height() / 2.0 + 60. / 2.0; // 60 je malo več kot polovica višine originalne slike ladje
-            let coin_flip_direction = random::<bool>();
-            let mut x_smer = 1.0;
-            if coin_flip_direction {
-                x_smer = -1.0;
-            }
-
-            let oglisca = create_vertex_vector(
-                OGLISCA_ENEMYSHIP_SLIKA.to_vec(), CENTER_ENEMYSHIP_SLIKA, (180_f32).to_radians(), 0.5);
-        
-            commands.spawn(
-                (
-                    Sprite{
-                        image: asset_server.load("sprites/spaceShips_004.png"),
-                        ..Default::default()
-                    },
-                    Transform::from_xyz(random_x, ship_y, 0.0).with_scale(Vec3::splat(0.5))
-                        .with_rotation(Quat::from_rotation_z((180_f32).to_radians())),
-                    EnemyShip {
-                        x_smer : x_smer,
-                        bullet_shoot_timer : Timer::from_seconds(ENEMYBULLET_SHOOT_TIME, TimerMode::Repeating),
-                        // oglisca_izhodisce : oglisca,
-                        // radij : ENEMYSHIP_RADIUS
-                    },
-                    Enemy {
-                        oglisca_izhodisce : oglisca,
-                        radij : ENEMYSHIP_RADIUS
-                    },
-                )
-            );            
+        let random_x = random::<f32>() * 512.0 - 256.; 
+        let ship_y = window.height() / 2.0 + 60. / 2.0; // 60 je malo več kot polovica višine originalne slike ladje
+        let coin_flip_direction = random::<bool>();
+        let mut x_smer = 1.0;
+        if coin_flip_direction {
+            x_smer = -1.0;
         }
-    }
+        let oglisca = create_vertex_vector(
+            OGLISCA_ENEMYSHIP_SLIKA.to_vec(), CENTER_ENEMYSHIP_SLIKA, (180_f32).to_radians(), 0.5);
+    
+        commands.spawn(
+            (
+                Sprite{
+                    image: asset_server.load("sprites/spaceShips_004.png"),
+                    ..Default::default()
+                },
+                Transform::from_xyz(random_x, ship_y, 0.0).with_scale(Vec3::splat(0.5))
+                    .with_rotation(Quat::from_rotation_z((180_f32).to_radians())),
+                EnemyShip {
+                    x_smer : x_smer,
+                    bullet_shoot_timer : Timer::from_seconds(ENEMYBULLET_SHOOT_TIME, TimerMode::Repeating),
+                    // oglisca_izhodisce : oglisca,
+                    // radij : ENEMYSHIP_RADIUS
+                },
+                Enemy {
+                    oglisca_izhodisce : oglisca,
+                    radij : ENEMYSHIP_RADIUS
+                },
+            )
+        );            
+}
 
 // fn create_enemyship_vertex_array() -> [Vec2; 16] {
 //     let mut oglisca_array: [Vec2; 16] = [Vec2::new(0., 0.); 16];
