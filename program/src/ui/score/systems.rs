@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::ui::score::resources::*;
 use crate::ui::score::components::*;
+use crate::ui::components::GameText;
 
 
 pub fn display_score_game_text(

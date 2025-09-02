@@ -9,8 +9,10 @@ pub mod components;
 pub mod resources;
 
 use resources::*;
+use systems::*;
 use gameover::*;
 use mainmenu::*;
+use crate::AppState;
 use score::resources::*;
 use score::ScorePlugin;
 
@@ -25,5 +27,7 @@ impl Plugin for UIPlugin {
         app.add_plugins(MainMenuPlugin);
         app.add_plugins(GameOverPlugin);
         app.add_plugins(ScorePlugin);
+        app.add_systems(OnEnter(AppState::Game), display_astronauts_game_text);
+        app.add_systems(Update, read_and_display_astronauts_missed.run_if(in_state(AppState::Game)));
     }
 }

@@ -11,7 +11,7 @@ use astronauts::AstronautPlugin;
 use player::PlayerPlugin;
 use enemies::EnemyPlugin;
 use ui::UIPlugin;
-use events::GameOver;
+use events::{GameOver, AstronautMissed};
 use crate::systems::*;
 
 
@@ -30,6 +30,7 @@ fn main() {
         }))
     .init_state::<AppState>()
     .add_event::<GameOver>()
+    .add_event::<AstronautMissed>()
     .add_plugins(UIPlugin)
     .add_plugins(PlayerPlugin)
     .add_plugins(AstronautPlugin)

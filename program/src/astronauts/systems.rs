@@ -5,12 +5,14 @@ use rand::prelude::*;
 use super::components::*;
 use super::resources::*;
 use crate::player::components::Player;
-use crate::ui::score::resources::{GameTime, Score};
+use crate::events::{GameOver, AstronautMissed};
+use crate::ui::score::resources::{Score, HighScore}; //GameTime
 
 const ASTRONAUT_SIZE: f32 = 64.0;
 const COLLECTION_DISTANCE: f32 = 32.0; //polovicna razdalja astronavta (da se priblizno zaletimo vanj)
 const ASTRONAUT_SPEED: f32 = 300.0; 
  
+
 pub fn tick_astronaut_spawn_timer(
     mut astronaut_spawn_timer: ResMut<AstronautSpawnTimer>,
     time: Res<Time>,
@@ -62,7 +64,7 @@ pub fn check_astronaut_collection(
 pub fn astronaut_movement(
     mut astronaut_query: Query<(&mut Transform, &Astronaut)>, 
     time: Res<Time>,
-    game_time: Res<GameTime>
+    // game_time: Res<GameTime>
 ) {
     let astronaut_direction = Vec3::new(0.0, -1.0, 0.0);
     
@@ -76,10 +78,16 @@ pub fn astronaut_movement(
     }
 }
 
-pub fn astronaut_despawn(
+pub fn check_handle_astronaut_missed(
     mut commands: Commands,
     astronaut_query: Query<(Entity, &Transform), With<Astronaut>>,
     window_query: Query<&Window>,
+    mut astronauts_missed_counter: ResMut<AstronautsMissedCounter>,
+    mut game_over_event_writer: EventWriter<GameOver>,
+    mut player_query: Query<Entity, With<Player>>,
+    score: Res<Score>,
+    mut high_score: ResMut<HighScore>,
+    mut astronaut_missed_event_writer: EventWriter<AstronautMissed>,
 ) {
     let window = window_query.get_single().unwrap();
     
@@ -92,6 +100,17 @@ pub fn astronaut_despawn(
             || translation.x > window.width() * 2.0
         {
             commands.entity(astronaut_entity).despawn();
+            astronauts_missed_counter.missed(); //suboptimalno, da ta še rihta vse ...
+            astronaut_missed_event_writer.send(AstronautMissed {counter : astronauts_missed_counter.counter} );
+            if astronauts_missed_counter.counter >= 3 {
+                if let Ok(player_entity) = player_query.get_single() {
+                commands.entity(player_entity).despawn();
+
+                let final_score = score.get_score();
+                let is_new_high_score = high_score.update(final_score); //suboptimalno, da je kle še flag
+    
+                game_over_event_writer.send(GameOver { score: final_score });                    
+            }}
         }
     }
 }
@@ -103,4 +122,10 @@ pub fn despawn_all_astronauts(
     for astronaut_entity in astronaut_query.iter() {
         commands.entity(astronaut_entity).despawn();
     }
+}
+
+pub fn reset_astronauts_missed_counter(
+    mut astronauts_missed_counter: ResMut<AstronautsMissedCounter>,
+) {
+    astronauts_missed_counter.reset();
 }

@@ -98,8 +98,8 @@ pub fn shoot_bullet(keyboard_input:
     mut commands: Commands,
     mut bullet_timer: ResMut<BulletShootTimer>,
 ){
-    if bullet_timer.timer.finished() & keyboard_input.just_pressed(KeyCode::Space) {
-        let ship_transform = player_query.single();
+    if bullet_timer.timer.finished() && keyboard_input.just_pressed(KeyCode::Space) {
+        if let Ok(ship_transform) = player_query.get_single() {
         commands.spawn((
             Sprite {
                 image: asset_server.load("sprites/spaceMissiles_015.png"),
@@ -114,6 +114,7 @@ pub fn shoot_bullet(keyboard_input:
         ));
         bullet_timer.timer.reset();
         bullet_timer.timer.unpause();
+        }
     }
 }
 

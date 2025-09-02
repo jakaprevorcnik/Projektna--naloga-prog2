@@ -24,7 +24,7 @@ pub fn display_mainmenu_text(
     ));
 
     commands.spawn((
-        Text2d::new("Welcome, ranger! You are on a mission in space!\nSave astronauts but beware of meteors and enemy ships.\nShoot bullets with the space key and earn additional points\nfor eliminating your foes."),
+        Text2d::new("Welcome, ranger! You are on a mission in space!\nSave astronauts but beware of meteors and enemy ships.\nSwiftly move left and right: should you miss 3 astronauts, you fail!\nShoot bullets with the space key and earn additional points\nfor eliminating your foes."),
         TextLayout::new(JustifyText::Center, LineBreak::WordBoundary),
         TextFont {
             font: asset_server.load("fonts/Pixellettersfull-BnJ5.ttf"),
