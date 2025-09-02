@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::prelude::*;
+use std::cmp::min;
 
 use crate::enemies::systems::{create_vertex_vector};
 use crate::enemies::components::Enemy;
@@ -12,6 +13,7 @@ use crate::enemies::enemyships::resources::EnemyShipSpawnTimers;
 
 const ENEMYSHIP_VERTICAL_SPEED: f32 = 50.0;
 const ENEMYSHIP_HORIZONTAL_SPEED: f32 = 120.0;
+const ENEMYSHIP_MAX_HORIZONTAL_SPEED: u32 = 250;
 
 const ENEMYSHIP_RADIUS: f32 = 67.0;
 const OGLISCA_ENEMYSHIP_SLIKA: [Vec2; 16] = [Vec2::new(17., 4.), Vec2::new(21.5, 0.), Vec2::new(104.5, 0.),
@@ -20,7 +22,7 @@ const OGLISCA_ENEMYSHIP_SLIKA: [Vec2; 16] = [Vec2::new(17., 4.), Vec2::new(21.5,
     Vec2::new(21., 106.), Vec2::new(3., 82.), Vec2::new(0., 73.), Vec2::new(0., 60.), Vec2::new(8., 28.)];
 const CENTER_ENEMYSHIP_SLIKA: Vec2 = Vec2::new(63., 54.);
 
-const ENEMYBULLET_SHOOT_TIME: f32 = 1.8;
+const ENEMYBULLET_SHOOT_TIME: f32 = 1.0;
 
 
 
@@ -104,13 +106,20 @@ fn spawn_enemyship(
 pub fn enemyship_movement(
     mut enemyship_query: Query<(&mut Transform, &EnemyShip)>, 
     time: Res<Time>,
+    game_time: Res<GameTime>
 ) {
     let enemyship_vertical = Vec3::new(0., -1., 0.);
     let enemyship_horizontal = Vec3::new(1.0, 0.0, 0.0);
     
+    
+    let time_intervals = game_time.get_time() / 30.0; 
+    let speed_increase = time_intervals * 50.0;
+    let potential_speed = ENEMYSHIP_HORIZONTAL_SPEED + speed_increase;
+    let new_speed = min(potential_speed as u32, ENEMYSHIP_MAX_HORIZONTAL_SPEED) as f32;
+    
     for (mut enemyship_transform, enemyship) in enemyship_query.iter_mut() {
         enemyship_transform.translation += enemyship_vertical * ENEMYSHIP_VERTICAL_SPEED * time.delta_secs(); // vertical
-        enemyship_transform.translation += enemyship_horizontal * enemyship.x_smer * ENEMYSHIP_HORIZONTAL_SPEED * time.delta_secs(); // horizontal
+        enemyship_transform.translation += enemyship_horizontal * enemyship.x_smer * new_speed * time.delta_secs(); // horizontal
     }
 }
 

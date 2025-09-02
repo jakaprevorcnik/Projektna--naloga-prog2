@@ -6,7 +6,7 @@ use crate::enemies::components::Enemy;
 use crate::enemies::enemyships::enemybullets::components::EnemyBullet;
 use crate::enemies::enemyships::components::EnemyShip;
 
-const ENEMYBULLET_SPEED: f32 = 200.0;
+const ENEMYBULLET_SPEED: f32 = 250.0;
 
 const ENEMYBULLET_RADIUS: f32 = 18.0;
 const OGLISCA_ENEMYBULLET_SLIKA: [Vec2; 12] = [Vec2::new(0., 7.), Vec2::new(1., 4.), Vec2::new(4., 0.),
